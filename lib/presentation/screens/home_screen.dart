@@ -1,7 +1,9 @@
+import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 
 import '../../app/routes.dart';
 import '../../app/theme.dart';
+import '../../game/pet_game.dart';
 import '../widgets/game_button.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -27,9 +29,9 @@ class HomeScreen extends StatelessWidget {
                 const Text('Pou Game', style: GameTextStyles.title),
                 const SizedBox(height: GameSpacing.sm),
                 const Text('Home', style: GameTextStyles.body),
-                const Spacer(),
-                const _PetRoomPlaceholder(),
-                const Spacer(),
+                const SizedBox(height: GameSpacing.lg),
+                const Expanded(child: _PetGamePanel()),
+                const SizedBox(height: GameSpacing.lg),
                 Wrap(
                   spacing: GameSpacing.sm,
                   runSpacing: GameSpacing.sm,
@@ -52,32 +54,35 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class _PetRoomPlaceholder extends StatelessWidget {
-  const _PetRoomPlaceholder();
+class _PetGamePanel extends StatelessWidget {
+  const _PetGamePanel();
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        width: 180,
-        height: 180,
-        decoration: BoxDecoration(
-          color: GameColors.panel.withValues(alpha: 0.86),
-          border: Border.all(color: GameColors.ink, width: 3),
-          borderRadius: BorderRadius.circular(GameRadius.lg),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x33000000),
-              offset: Offset(0, 8),
-              blurRadius: 0,
+    return Container(
+      decoration: BoxDecoration(
+        color: GameColors.panel.withValues(alpha: 0.86),
+        border: Border.all(color: GameColors.ink, width: 3),
+        borderRadius: BorderRadius.circular(GameRadius.lg),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x33000000),
+            offset: Offset(0, 8),
+            blurRadius: 0,
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: GameWidget(
+        game: PetGame(),
+        backgroundBuilder: (_) => const DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xFFFFF7D6), Color(0xFFEAF7FF)],
             ),
-          ],
-        ),
-        alignment: Alignment.center,
-        child: const Text(
-          'Pet area',
-          style: GameTextStyles.roomTitle,
-          textAlign: TextAlign.center,
+          ),
         ),
       ),
     );
