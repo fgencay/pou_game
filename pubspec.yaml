@@ -27,5 +27,12 @@ flutter:
   assets:
     - assets/images/pets/cat/
     - assets/images/backgrounds/
+    - assets/images/ui/navigation/
+    - assets/images/ui/coin.png
+    - assets/images/ui/hunger.png
+    - assets/images/ui/healty.png
+    - assets/images/ui/toilet.png
+    - assets/images/ui/energy.png
     - assets/audio/
+
 

@@ -15,9 +15,15 @@ class PetGame extends FlameGame {
   @override
   Future<void> onLoad() async {
     final catIdleImage = await images.load(GameAssets.catIdle);
+    final catBlinkImage = await images.load(GameAssets.catBlink);
+    final catHappyImage = await images.load(GameAssets.catHappy);
 
     _pet = PetComponent(
-      sprite: Sprite(catIdleImage),
+      sprites: {
+        CatVisualState.idle: Sprite(catIdleImage),
+        CatVisualState.blink: Sprite(catBlinkImage),
+        CatVisualState.happy: Sprite(catHappyImage),
+      },
       sourceSize: Vector2(
         catIdleImage.width.toDouble(),
         catIdleImage.height.toDouble(),
