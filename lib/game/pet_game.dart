@@ -1,15 +1,31 @@
+import 'dart:ui';
+
+import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 
+import '../core/config/game_assets.dart';
 import 'components/pet_component.dart';
 
 class PetGame extends FlameGame {
   late final PetComponent _pet;
 
   @override
+  Color backgroundColor() => const Color(0x00000000);
+
+  @override
   Future<void> onLoad() async {
-    _pet = PetComponent();
+    final catIdleImage = await images.load(GameAssets.catIdle);
+
+    _pet = PetComponent(
+      sprite: Sprite(catIdleImage),
+      sourceSize: Vector2(
+        catIdleImage.width.toDouble(),
+        catIdleImage.height.toDouble(),
+      ),
+    );
+
     await add(_pet);
-    _centerPet();
+    _layoutPet();
   }
 
   @override
@@ -17,11 +33,13 @@ class PetGame extends FlameGame {
     super.onGameResize(size);
 
     if (isLoaded) {
-      _centerPet();
+      _layoutPet();
     }
   }
 
-  void _centerPet() {
-    _pet.position = size / 2;
+  void _layoutPet() {
+    final targetHeight = (size.y * 0.62).clamp(140.0, 320.0);
+    _pet.resizeToHeight(targetHeight);
+    _pet.position = Vector2(size.x / 2, size.y * 0.68);
   }
 }
