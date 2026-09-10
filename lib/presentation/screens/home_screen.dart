@@ -182,7 +182,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           if (_isSleeping)
             Positioned(
-              top: MediaQuery.paddingOf(context).top + 132,
+              top: MediaQuery.paddingOf(context).top + 230,
               left: 0,
               right: 0,
               child: const IgnorePointer(
@@ -904,12 +904,12 @@ class _SleepingZzzWidgetState extends State<_SleepingZzzWidget>
                   'Z z z . . .',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 32,
+                    fontSize: 20,
                     fontWeight: FontWeight.w900,
-                    letterSpacing: 4,
+                    letterSpacing: 2,
                     foreground: ui.Paint()
                       ..style = ui.PaintingStyle.stroke
-                      ..strokeWidth = 6
+                      ..strokeWidth = 3.5
                       ..color = const Color(0xFF1E1B4B),
                   ),
                 ),
@@ -917,14 +917,14 @@ class _SleepingZzzWidgetState extends State<_SleepingZzzWidget>
                   'Z z z . . .',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 32,
+                    fontSize: 20,
                     fontWeight: FontWeight.w900,
-                    letterSpacing: 4,
+                    letterSpacing: 2,
                     color: Color(0xFFFFE066),
                     shadows: [
                       Shadow(
                         color: Color(0xFFFFB13B),
-                        blurRadius: 14,
+                        blurRadius: 10,
                       ),
                     ],
                   ),
