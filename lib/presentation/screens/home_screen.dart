@@ -141,6 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (_isPlayingToiletVideo)
             Positioned.fill(
               child: _ToiletVideoOverlay(
+                onStarted: _onToiletVideoStarted,
                 onFinished: _onToiletVideoFinished,
               ),
             ),
@@ -234,6 +235,10 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _isPlayingToiletVideo = true;
     });
+  }
+
+  void _onToiletVideoStarted() {
+    if (!mounted) return;
     _game.setPetVisible(false);
   }
 
@@ -959,9 +964,13 @@ class _SleepingZzzWidgetState extends State<_SleepingZzzWidget>
 }
 
 class _ToiletVideoOverlay extends StatefulWidget {
-  const _ToiletVideoOverlay({required this.onFinished});
+  const _ToiletVideoOverlay({
+    required this.onFinished,
+    this.onStarted,
+  });
 
   final VoidCallback onFinished;
+  final VoidCallback? onStarted;
 
   @override
   State<_ToiletVideoOverlay> createState() => _ToiletVideoOverlayState();
@@ -984,6 +993,7 @@ class _ToiletVideoOverlayState extends State<_ToiletVideoOverlay> {
           _initialized = true;
         });
         controller.play();
+        widget.onStarted?.call();
       }).catchError((_) {
         _callFinished();
       });
