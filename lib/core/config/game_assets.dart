@@ -37,4 +37,5 @@ class GameAssets {
   static const dogEating = 'pets/cat/kopekyemekli.png';
   static const eatAudio = 'eat.mp3';
   static const catToiletVideo = 'assets/videos/cat_toilet.mp4';
+  static const dogToiletVideo = 'assets/videos/dog_toilet.mp4';
 }

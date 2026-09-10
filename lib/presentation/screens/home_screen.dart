@@ -141,6 +141,9 @@ class _HomeScreenState extends State<HomeScreen> {
           if (_isPlayingToiletVideo)
             Positioned.fill(
               child: _ToiletVideoOverlay(
+                videoAssetPath: _petInventory.activePet == PetType.dog
+                    ? GameAssets.dogToiletVideo
+                    : GameAssets.catToiletVideo,
                 onStarted: _onToiletVideoStarted,
                 onFinished: _onToiletVideoFinished,
               ),
@@ -965,10 +968,12 @@ class _SleepingZzzWidgetState extends State<_SleepingZzzWidget>
 
 class _ToiletVideoOverlay extends StatefulWidget {
   const _ToiletVideoOverlay({
+    required this.videoAssetPath,
     required this.onFinished,
     this.onStarted,
   });
 
+  final String videoAssetPath;
   final VoidCallback onFinished;
   final VoidCallback? onStarted;
 
@@ -985,7 +990,7 @@ class _ToiletVideoOverlayState extends State<_ToiletVideoOverlay> {
   void initState() {
     super.initState();
     try {
-      final controller = VideoPlayerController.asset(GameAssets.catToiletVideo);
+      final controller = VideoPlayerController.asset(widget.videoAssetPath);
       _controller = controller;
       controller.initialize().then((_) {
         if (!mounted) return;
