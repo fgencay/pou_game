@@ -1,8 +1,8 @@
 import 'dart:ui';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
-import 'package:flame_audio/flame_audio.dart';
 
 import '../../core/config/game_assets.dart';
 
@@ -124,7 +124,8 @@ class PetComponent extends SpriteComponent with TapCallbacks, DragCallbacks {
 
   void _playEatingSound() {
     try {
-      FlameAudio.play(GameAssets.eatAudio);
+      final player = AudioPlayer();
+      player.play(AssetSource('audio/eat.mp3'));
     } catch (_) {}
   }
 
