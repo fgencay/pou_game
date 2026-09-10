@@ -250,6 +250,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _isPlayingToiletVideo = false;
       petStats = _statRules.clean(petStats);
+      _progress = _progress.earnXp(25);
     });
     _game.setPetVisible(true);
   }
@@ -493,7 +494,7 @@ class _StatHud extends StatelessWidget {
     final screenWidth = MediaQuery.sizeOf(context).width;
     final iconSize = (screenWidth * 0.145).clamp(46.0, 66.0);
     final health =
-        (stats.hunger + stats.energy + stats.happiness + stats.cleanliness) / 4;
+        (stats.hunger + stats.energy + stats.cleanliness) / 3;
 
     return Row(
       mainAxisSize: MainAxisSize.min,

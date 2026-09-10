@@ -21,15 +21,17 @@ class PetStatDecay {
     if (seconds <= 0) return stats;
 
     final hungerDecay = GameConfig.hungerDecayPerMinute * seconds / 60;
+    final cleanlinessDecay = (GameConfig.cleanlinessDecayPerMinute * seconds / 60) + (0.10 * seconds);
     final nextHunger = (stats.hunger - hungerDecay).clamp(GameConfig.minStat, GameConfig.maxStat);
+    final nextCleanliness = (stats.cleanliness - cleanlinessDecay).clamp(GameConfig.minStat, GameConfig.maxStat);
 
     if (isSleeping) {
       final nextEnergy = (stats.energy + 12.0 * seconds).clamp(GameConfig.minStat, GameConfig.maxStat);
-      return stats.copyWith(hunger: nextHunger, energy: nextEnergy);
+      return stats.copyWith(hunger: nextHunger, cleanliness: nextCleanliness, energy: nextEnergy);
     } else {
       final energyDecay = (GameConfig.energyDecayPerMinute * seconds / 60) + (0.12 * seconds);
       final nextEnergy = (stats.energy - energyDecay).clamp(GameConfig.minStat, GameConfig.maxStat);
-      return stats.copyWith(hunger: nextHunger, energy: nextEnergy);
+      return stats.copyWith(hunger: nextHunger, cleanliness: nextCleanliness, energy: nextEnergy);
     }
   }
 
