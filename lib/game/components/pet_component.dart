@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 
@@ -28,8 +30,15 @@ class PetComponent extends SpriteComponent with TapCallbacks, DragCallbacks {
   double _happyTimer = 0;
   double _eatingTimer = 0;
   int _blinkDelayIndex = 0;
+  bool isVisible = true;
 
   CatVisualState get visualState => _visualState;
+
+  @override
+  void render(Canvas canvas) {
+    if (!isVisible) return;
+    super.render(canvas);
+  }
 
   @override
   void update(double dt) {
@@ -69,6 +78,8 @@ class PetComponent extends SpriteComponent with TapCallbacks, DragCallbacks {
 
   @override
   bool containsLocalPoint(Vector2 point) {
+    if (!isVisible) return false;
+
     final left = size.x * 0.16;
     final right = size.x * 0.84;
     final top = size.y * 0.18;

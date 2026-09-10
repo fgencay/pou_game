@@ -7,6 +7,10 @@ class GameAssets {
       'assets/images/backgrounds/bathroom.png';
   static const bedroomRoomBackground =
       'assets/images/backgrounds/bedroom.png';
+  static const bedroomSleepBackground =
+      'assets/images/backgrounds/bedroom_sleep.png';
+  static const bedroomSleepDogBackground =
+      'assets/images/backgrounds/bedroom_sleep_dog.png';
   static const fridgeIcon = 'assets/images/ui/navigation/fridge.png';
   static const apple = 'assets/images/items/food/apple.png';
   static const coinIcon = 'assets/images/ui/coin.png';

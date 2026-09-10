@@ -27,6 +27,12 @@ class PetGame extends FlameGame {
     if (isLoaded) _pet.showEatingThenHappy();
   }
 
+  void setPetVisible(bool visible) {
+    if (isLoaded) {
+      _pet.isVisible = visible;
+    }
+  }
+
   Future<void> setPetType(PetType petType) async {
     _currentPet = petType;
     if (!isLoaded) return;

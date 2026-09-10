@@ -48,9 +48,18 @@ class _HomeScreenState extends State<HomeScreen> {
   static const _statRules = PetStatDecay();
   PetStats petStats = PetStats();
   late PetRoom _room = widget.initialRoom;
+  bool _isSleeping = false;
   bool get _isKitchen => _room == PetRoom.kitchen;
   bool get _isBathroom => _room == PetRoom.bathroom;
   bool get _isBedroom => _room == PetRoom.bedroom;
+
+  void _setRoom(PetRoom newRoom) {
+    setState(() {
+      _room = newRoom;
+      _isSleeping = false;
+    });
+    _game.setPetVisible(true);
+  }
 
   String get _roomBackground {
     switch (_room) {
@@ -59,6 +68,11 @@ class _HomeScreenState extends State<HomeScreen> {
       case PetRoom.bathroom:
         return GameAssets.bathroomRoomBackground;
       case PetRoom.bedroom:
+        if (_isSleeping) {
+          return _petInventory.activePet == PetType.dog
+              ? GameAssets.bedroomSleepDogBackground
+              : GameAssets.bedroomSleepBackground;
+        }
         return GameAssets.bedroomRoomBackground;
       case PetRoom.home:
         return GameAssets.homeRoomBackground;
@@ -83,22 +97,22 @@ class _HomeScreenState extends State<HomeScreen> {
       case PetRoom.home:
         return null;
       case PetRoom.kitchen:
-        return () => setState(() => _room = PetRoom.home);
+        return () => _setRoom(PetRoom.home);
       case PetRoom.bathroom:
-        return () => setState(() => _room = PetRoom.kitchen);
+        return () => _setRoom(PetRoom.kitchen);
       case PetRoom.bedroom:
-        return () => setState(() => _room = PetRoom.bathroom);
+        return () => _setRoom(PetRoom.bathroom);
     }
   }
 
   VoidCallback? get _onNextRoom {
     switch (_room) {
       case PetRoom.home:
-        return () => setState(() => _room = PetRoom.kitchen);
+        return () => _setRoom(PetRoom.kitchen);
       case PetRoom.kitchen:
-        return () => setState(() => _room = PetRoom.bathroom);
+        return () => _setRoom(PetRoom.bathroom);
       case PetRoom.bathroom:
-        return () => setState(() => _room = PetRoom.bedroom);
+        return () => _setRoom(PetRoom.bedroom);
       case PetRoom.bedroom:
         return null;
     }
@@ -198,8 +212,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _sleepPet() {
-    setState(() => petStats = _statRules.rest(petStats));
-    _game.reactToFood();
+    setState(() {
+      _isSleeping = !_isSleeping;
+      if (_isSleeping) {
+        petStats = _statRules.rest(petStats);
+      }
+    });
+    _game.setPetVisible(!_isSleeping);
   }
 
   void _feedAt(Food food, Offset globalPoint) {

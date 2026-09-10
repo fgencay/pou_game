@@ -32,4 +32,37 @@ void main() {
     );
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('tapping lamp in bedroom toggles sleep background and back', (tester) async {
+    tester.view.physicalSize = const Size(360, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      const MaterialApp(home: HomeScreen(initialRoom: PetRoom.bedroom)),
+    );
+    await tester.pump();
+
+    expect(
+      find.image(const AssetImage(GameAssets.bedroomRoomBackground)),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.image(const AssetImage(GameAssets.lampNavigationButton)));
+    await tester.pump();
+
+    expect(
+      find.image(const AssetImage(GameAssets.bedroomSleepBackground)),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.image(const AssetImage(GameAssets.lampNavigationButton)));
+    await tester.pump();
+
+    expect(
+      find.image(const AssetImage(GameAssets.bedroomRoomBackground)),
+      findsOneWidget,
+    );
+  });
 }
