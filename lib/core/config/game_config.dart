@@ -18,4 +18,12 @@ class GameConfig {
   static const tiredThreshold = 30.0;
   static const unhappyThreshold = 35.0;
   static const dirtyThreshold = 35.0;
+
+  static const playEnergyPerMinute = 2.0;
+  static const playCoinsPerLine = 5;
+  static const playXpIntervalSeconds = 5;
+  static const playXpPerInterval = 2;
+  static const extraLevelXpStep = 350;
+  static const defaultXp = 0;
+  static const levelXpThresholds = [0, 100, 250, 450, 700, 1000];
 }

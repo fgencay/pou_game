@@ -11,6 +11,8 @@ dependencies:
   flutter:
     sdk: flutter
 
+  tetris_engine:
+    path: third_party/tetris_engine
   flame: ^1.35.1
   provider: ^6.1.5+1
   shared_preferences: ^2.5.5
@@ -27,12 +29,14 @@ flutter:
   assets:
     - assets/images/pets/cat/
     - assets/images/backgrounds/
+    - assets/images/items/food/
     - assets/images/ui/navigation/
     - assets/images/ui/coin.png
     - assets/images/ui/hunger.png
     - assets/images/ui/healty.png
     - assets/images/ui/toilet.png
     - assets/images/ui/energy.png
+    - assets/images/ui/level.png
     - assets/audio/
 
 

@@ -73,13 +73,13 @@ class PetComponent extends SpriteComponent with TapCallbacks, DragCallbacks {
   @override
   void onTapDown(TapDownEvent event) {
     super.onTapDown(event);
-    _showHappy();
+    showHappy();
   }
 
   @override
   void onDragStart(DragStartEvent event) {
     super.onDragStart(event);
-    _showHappy();
+    showHappy();
   }
 
   void resizeToHeight(double height) {
@@ -87,7 +87,7 @@ class PetComponent extends SpriteComponent with TapCallbacks, DragCallbacks {
     size = Vector2(height * aspectRatio, height);
   }
 
-  void _showHappy() {
+  void showHappy() {
     _happyTimer = _happyDuration;
     _setVisualState(CatVisualState.happy);
   }

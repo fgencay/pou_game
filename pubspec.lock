@@ -333,6 +333,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.6"
+  tetris_engine:
+    dependency: "direct main"
+    description:
+      path: "third_party/tetris_engine"
+      relative: true
+    source: path
+    version: "1.1.0"
   vector_math:
     dependency: transitive
     description:

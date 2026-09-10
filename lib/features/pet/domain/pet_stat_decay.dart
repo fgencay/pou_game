@@ -4,6 +4,15 @@ import '../models/pet_stats.dart';
 class PetStatDecay {
   const PetStatDecay();
 
+  PetStats applyHunger(PetStats stats, double seconds) {
+    if (seconds <= 0) return stats;
+    return stats.copyWith(
+      hunger: stats.hunger - GameConfig.hungerDecayPerMinute * seconds / 60,
+    );
+  }
+
+  PetStats feed(PetStats stats) => stats.copyWith(hunger: GameConfig.maxStat);
+
   PetStats apply(PetStats currentStats, Duration elapsed) {
     if (elapsed <= Duration.zero) {
       return currentStats;

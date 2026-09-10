@@ -1,4 +1,8 @@
 import 'dart:ui' as ui;
+import '../widgets/pet_progress_dialog.dart';
+import '../../features/economy/models/play_session.dart';
+import 'game_room_screen.dart';
+import 'tetris_screen.dart';
 
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
@@ -6,24 +10,55 @@ import 'package:flutter/material.dart';
 import '../../app/theme.dart';
 import '../../core/config/game_assets.dart';
 import '../../core/config/game_config.dart';
+import '../../features/economy/models/player_progress.dart';
 import '../../features/pet/models/pet_stats.dart';
 import '../../game/pet_game.dart';
+import '../widgets/room_navigation.dart';
+import '../widgets/draggable_food_item.dart';
+import '../../features/pet/domain/pet_stat_decay.dart';
+import '../widgets/fridge_shop.dart';
+import '../../features/economy/models/food_purchase.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+enum PetRoom { home, kitchen }
 
-  static const _startingCoinAmount = 250;
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({
+    super.key,
+    this.playerProgress = const PlayerProgress(),
+    this.initialRoom = PetRoom.home,
+  });
+  final PlayerProgress playerProgress;
+
+  final PetRoom initialRoom;
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final FoodPurchase _purchases = FoodPurchase();
+  late PlayerProgress _progress = widget.playerProgress;
+  late final PetGame _game = PetGame(onTimeElapsed: _decayHunger);
+  final GlobalKey _petPanelKey = GlobalKey();
+  static const _statRules = PetStatDecay();
+  PetStats petStats = PetStats();
+  late PetRoom _room = widget.initialRoom;
+  bool get _isKitchen => _room == PetRoom.kitchen;
 
   @override
   Widget build(BuildContext context) {
     final bottomNavigationHeight = _bottomNavigationHeight(context);
-    final petStats = PetStats();
 
     return Scaffold(
       body: Stack(
         fit: StackFit.expand,
         children: [
-          Image.asset(GameAssets.homeRoomBackground, fit: BoxFit.cover),
+          Image.asset(
+            _isKitchen
+                ? GameAssets.kitchenRoomBackground
+                : GameAssets.homeRoomBackground,
+            fit: BoxFit.cover,
+          ),
           DecoratedBox(
             decoration: BoxDecoration(
               color: GameColors.sky.withValues(alpha: 0.08),
@@ -38,7 +73,7 @@ class HomeScreen extends StatelessWidget {
                 GameSpacing.lg,
                 bottomNavigationHeight + GameSpacing.md,
               ),
-              child: const _PetGamePanel(),
+              child: _PetGamePanel(key: _petPanelKey, game: _game),
             ),
           ),
           SafeArea(
@@ -48,22 +83,119 @@ class HomeScreen extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.only(
                   left: GameSpacing.sm,
+                  right: GameSpacing.sm,
                   top: GameSpacing.xs,
                 ),
-                child: _TopHud(
-                  coinAmount: _startingCoinAmount,
-                  stats: petStats,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _TopHud(
+                      coinAmount: _purchases.coins,
+                      stats: petStats,
+                      level: _progress.level,
+                      onLevelPressed: _openProgress,
+                    ),
+                    const SizedBox(height: 12),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: RoomNavigation(
+                        roomName: _isKitchen ? 'Kitchen' : 'Home',
+                        onPrevious: _isKitchen
+                            ? () => setState(() => _room = PetRoom.home)
+                            : null,
+                        onNext: _isKitchen
+                            ? null
+                            : () => setState(() => _room = PetRoom.kitchen),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
           Align(
             alignment: Alignment.bottomCenter,
-            child: _BottomNavigationOverlay(height: bottomNavigationHeight),
+            child: _BottomNavigationOverlay(
+              height: bottomNavigationHeight,
+              isKitchen: _isKitchen,
+              food: _purchases.selected,
+              onFridgePressed: _openFridge,
+              onGamesPressed: _openGames,
+              foodCount: _purchases.quantity(_purchases.selected),
+              onFoodDropped: _feedAt,
+            ),
           ),
         ],
       ),
     );
+  }
+
+  void _decayHunger(double seconds) {
+    if (!mounted) return;
+    final next = _statRules.applyHunger(petStats, seconds);
+    if (next != petStats) setState(() => petStats = next);
+  }
+
+  void _feedAt(Food food, Offset globalPoint) {
+    final box = _petPanelKey.currentContext?.findRenderObject();
+    if (!_isKitchen ||
+        box is! RenderBox ||
+        !_game.canFeedAt(box.globalToLocal(globalPoint))) {
+      return;
+    }
+    if (!_purchases.consume(food)) return;
+    setState(() => petStats = _statRules.feed(petStats));
+    _game.reactToFood();
+  }
+
+  void _openProgress() {
+    showDialog<void>(
+      context: context,
+      builder: (_) => PetProgressDialog(progress: _progress),
+    );
+  }
+
+  void _applyPlayReward(PlayReward reward) {
+    if (!mounted) return;
+    setState(() {
+      _purchases.earnCoins(reward.coins);
+      _progress = _progress.earnXp(reward.xp);
+      petStats = petStats.copyWith(energy: petStats.energy - reward.energy);
+    });
+  }
+
+  Future<void> _openGames() async {
+    _game.pauseEngine();
+    try {
+      final play = await showDialog<bool>(
+        context: context,
+        builder: (_) => const GameRoomScreen(),
+      );
+      if (play == true && mounted) {
+        await Navigator.push(
+          context,
+          MaterialPageRoute<void>(
+            builder: (_) => TetrisScreen(
+              initialEnergy: petStats.energy,
+              onReward: _applyPlayReward,
+            ),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) _game.resumeEngine();
+    }
+  }
+
+  Future<void> _openFridge() async {
+    final food = await showDialog<Food>(
+      context: context,
+      builder: (_) => FridgeShop(coins: _purchases.coins),
+    );
+    if (!mounted || food == null) return;
+    setState(() {
+      _purchases.buy(food);
+    });
   }
 
   double _bottomNavigationHeight(BuildContext context) {
@@ -73,9 +205,16 @@ class HomeScreen extends StatelessWidget {
 }
 
 class _TopHud extends StatelessWidget {
-  const _TopHud({required this.coinAmount, required this.stats});
+  const _TopHud({
+    required this.coinAmount,
+    required this.stats,
+    required this.level,
+    required this.onLevelPressed,
+  });
 
   final int coinAmount;
+  final VoidCallback onLevelPressed;
+  final int level;
   final PetStats stats;
 
   @override
@@ -86,7 +225,24 @@ class _TopHud extends StatelessWidget {
       children: [
         _CoinCounter(amount: coinAmount),
         const SizedBox(width: GameSpacing.xs),
-        _StatHud(stats: stats),
+        Expanded(
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.topCenter,
+            child: _StatHud(stats: stats),
+          ),
+        ),
+        const SizedBox(width: GameSpacing.xs),
+        Semantics(
+          button: true,
+          label: 'Pet level',
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            key: const ValueKey('pet-level-button'),
+            onTap: onLevelPressed,
+            child: _LevelCounter(level: level),
+          ),
+        ),
       ],
     );
   }
@@ -105,7 +261,7 @@ class _CoinCounter extends StatelessWidget {
     final text = amount.toString();
 
     return SizedBox(
-      width: iconSize + fontSize * 2.55,
+      width: iconSize * 0.58 + fontSize * 2,
       height: iconSize + fontSize * 0.35,
       child: Stack(
         clipBehavior: Clip.none,
@@ -127,6 +283,37 @@ class _CoinCounter extends StatelessWidget {
   }
 }
 
+class _LevelCounter extends StatelessWidget {
+  const _LevelCounter({required this.level});
+
+  final int level;
+
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    // Compensate for the wider transparent margins in the level PNG.
+    final iconSize = (screenWidth * 0.13).clamp(42.0, 62.0) * 1.3;
+    final fontSize = (screenWidth * 0.07).clamp(22.0, 32.0);
+
+    return SizedBox.square(
+      dimension: iconSize,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Positioned.fill(child: Image.asset(GameAssets.levelIcon)),
+          Transform.translate(
+            offset: Offset(0, iconSize * -0.03),
+            child: _OutlinedAmountText(
+              text: level.toString(),
+              fontSize: fontSize,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _StatHud extends StatelessWidget {
   const _StatHud({required this.stats});
 
@@ -135,7 +322,7 @@ class _StatHud extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.sizeOf(context).width;
-    final iconSize = (screenWidth * 0.125).clamp(42.0, 58.0);
+    final iconSize = (screenWidth * 0.145).clamp(46.0, 66.0);
     final health =
         (stats.hunger + stats.energy + stats.happiness + stats.cleanliness) / 4;
 
@@ -313,7 +500,21 @@ class _OutlinedAmountText extends StatelessWidget {
 }
 
 class _BottomNavigationOverlay extends StatelessWidget {
-  const _BottomNavigationOverlay({required this.height});
+  const _BottomNavigationOverlay({
+    required this.height,
+    required this.isKitchen,
+    required this.food,
+    required this.onFridgePressed,
+    required this.onGamesPressed,
+    required this.foodCount,
+    required this.onFoodDropped,
+  });
+  final bool isKitchen;
+  final Food food;
+  final VoidCallback onFridgePressed;
+  final VoidCallback onGamesPressed;
+  final int foodCount;
+  final void Function(Food, Offset) onFoodDropped;
 
   final double height;
 
@@ -343,19 +544,38 @@ class _BottomNavigationOverlay extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
+            if (isKitchen)
+              SizedBox(
+                width: iconSize + 28,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    DraggableFoodItem(
+                      food: food,
+                      size: iconSize,
+                      count: foodCount,
+                      onDropped: onFoodDropped,
+                    ),
+                    SizedBox(height: 1 + labelHeight),
+                  ],
+                ),
+              )
+            else
+              _NavigationImageItem(
+                assetPath: GameAssets.joystickNavigationButton,
+                label: 'Games',
+                iconSize: iconSize,
+                labelSize: labelSize,
+                onPressed: onGamesPressed,
+              ),
             _NavigationImageItem(
-              assetPath: GameAssets.joystickNavigationButton,
-              label: 'Games',
+              assetPath: isKitchen
+                  ? GameAssets.fridgeIcon
+                  : GameAssets.shopNavigationButton,
+              label: isKitchen ? 'Fridge' : 'Shop',
               iconSize: iconSize,
               labelSize: labelSize,
-              onPressed: () {},
-            ),
-            _NavigationImageItem(
-              assetPath: GameAssets.shopNavigationButton,
-              label: 'Shop',
-              iconSize: iconSize,
-              labelSize: labelSize,
-              onPressed: () {},
+              onPressed: isKitchen ? onFridgePressed : () {},
             ),
           ],
         ),
@@ -451,14 +671,15 @@ class _OutlinedGameLabel extends StatelessWidget {
 }
 
 class _PetGamePanel extends StatelessWidget {
-  const _PetGamePanel();
+  const _PetGamePanel({super.key, required this.game});
+  final PetGame game;
 
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(GameRadius.lg),
       child: GameWidget(
-        game: PetGame(),
+        game: game,
         backgroundBuilder: (_) => const SizedBox.expand(),
       ),
     );

@@ -1,0 +1,4 @@
+# Keep upstream source unchanged; host application lint rules do not apply here.
+analyzer:
+  exclude:
+    - .dart_tool/**
