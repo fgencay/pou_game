@@ -138,6 +138,12 @@ class _HomeScreenState extends State<HomeScreen> {
               color: GameColors.sky.withValues(alpha: 0.08),
             ),
           ),
+          if (_isPlayingToiletVideo)
+            Positioned.fill(
+              child: _ToiletVideoOverlay(
+                onFinished: _onToiletVideoFinished,
+              ),
+            ),
           SafeArea(
             bottom: false,
             child: Padding(
@@ -209,12 +215,6 @@ class _HomeScreenState extends State<HomeScreen> {
               onFoodDropped: _feedAt,
             ),
           ),
-          if (_isPlayingToiletVideo)
-            Positioned.fill(
-              child: _ToiletVideoOverlay(
-                onFinished: _onToiletVideoFinished,
-              ),
-            ),
         ],
       ),
     );
@@ -234,6 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _isPlayingToiletVideo = true;
     });
+    _game.setPetVisible(false);
   }
 
   void _onToiletVideoFinished() {
@@ -242,7 +243,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _isPlayingToiletVideo = false;
       petStats = _statRules.clean(petStats);
     });
-    _game.reactToFood();
+    _game.setPetVisible(true);
   }
 
   void _sleepPet() {
