@@ -2,6 +2,9 @@ import 'dart:ui';
 
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
+import 'package:flame_audio/flame_audio.dart';
+
+import '../../core/config/game_assets.dart';
 
 const _blinkDuration = 0.18;
 const _happyDuration = 1.45;
@@ -116,6 +119,13 @@ class PetComponent extends SpriteComponent with TapCallbacks, DragCallbacks {
   void showEatingThenHappy() {
     _eatingTimer = _eatingDuration;
     _setVisualState(CatVisualState.eating);
+    _playEatingSound();
+  }
+
+  void _playEatingSound() {
+    try {
+      FlameAudio.play(GameAssets.eatAudio);
+    } catch (_) {}
   }
 
   void updatePetType({
