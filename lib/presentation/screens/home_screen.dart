@@ -175,15 +175,22 @@ class _HomeScreenState extends State<HomeScreen> {
                         onNext: _onNextRoom,
                       ),
                     ),
-                    if (_isSleeping) ...[
-                      const SizedBox(height: 14),
-                      const _SleepingZzzWidget(),
-                    ],
                   ],
                 ),
               ),
             ),
           ),
+          if (_isSleeping)
+            Positioned(
+              top: MediaQuery.paddingOf(context).top + 132,
+              left: 0,
+              right: 0,
+              child: const IgnorePointer(
+                child: Center(
+                  child: _SleepingZzzWidget(),
+                ),
+              ),
+            ),
           Align(
             alignment: Alignment.bottomCenter,
             child: _BottomNavigationOverlay(
@@ -862,17 +869,17 @@ class _SleepingZzzWidgetState extends State<_SleepingZzzWidget>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 1400),
+    duration: const Duration(milliseconds: 1200),
   )..repeat(reverse: true);
 
   late final Animation<double> _scaleAnimation = Tween<double>(
-    begin: 0.94,
-    end: 1.08,
+    begin: 0.95,
+    end: 1.15,
   ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
   late final Animation<double> _offsetAnimation = Tween<double>(
     begin: 0.0,
-    end: -5.0,
+    end: -10.0,
   ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
   @override
@@ -890,35 +897,39 @@ class _SleepingZzzWidgetState extends State<_SleepingZzzWidget>
           offset: Offset(0, _offsetAnimation.value),
           child: Transform.scale(
             scale: _scaleAnimation.value,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
-              decoration: BoxDecoration(
-                color: const Color(0xCC1E1B4B),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: const Color(0x99A5B4FC), width: 1.5),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x66000000),
-                    blurRadius: 10,
-                    offset: Offset(0, 4),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Text(
+                  'Z z z . . .',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 4,
+                    foreground: ui.Paint()
+                      ..style = ui.PaintingStyle.stroke
+                      ..strokeWidth = 6
+                      ..color = const Color(0xFF1E1B4B),
                   ),
-                ],
-              ),
-              child: const Text(
-                'Zzz...',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFFF1F5F9),
-                  letterSpacing: 3,
-                  shadows: [
-                    Shadow(
-                      color: Color(0xFF818CF8),
-                      blurRadius: 10,
-                    ),
-                  ],
                 ),
-              ),
+                const Text(
+                  'Z z z . . .',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 4,
+                    color: Color(0xFFFFE066),
+                    shadows: [
+                      Shadow(
+                        color: Color(0xFFFFB13B),
+                        blurRadius: 14,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         );
