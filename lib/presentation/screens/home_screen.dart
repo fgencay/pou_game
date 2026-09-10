@@ -175,6 +175,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         onNext: _onNextRoom,
                       ),
                     ),
+                    if (_isSleeping) ...[
+                      const SizedBox(height: 14),
+                      const _SleepingZzzWidget(),
+                    ],
                   ],
                 ),
               ),
@@ -843,6 +847,82 @@ class _PetGamePanel extends StatelessWidget {
         game: game,
         backgroundBuilder: (_) => const SizedBox.expand(),
       ),
+    );
+  }
+}
+
+class _SleepingZzzWidget extends StatefulWidget {
+  const _SleepingZzzWidget();
+
+  @override
+  State<_SleepingZzzWidget> createState() => _SleepingZzzWidgetState();
+}
+
+class _SleepingZzzWidgetState extends State<_SleepingZzzWidget>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1400),
+  )..repeat(reverse: true);
+
+  late final Animation<double> _scaleAnimation = Tween<double>(
+    begin: 0.94,
+    end: 1.08,
+  ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+
+  late final Animation<double> _offsetAnimation = Tween<double>(
+    begin: 0.0,
+    end: -5.0,
+  ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: Offset(0, _offsetAnimation.value),
+          child: Transform.scale(
+            scale: _scaleAnimation.value,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+              decoration: BoxDecoration(
+                color: const Color(0xCC1E1B4B),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: const Color(0x99A5B4FC), width: 1.5),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x66000000),
+                    blurRadius: 10,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: const Text(
+                'Zzz...',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFFF1F5F9),
+                  letterSpacing: 3,
+                  shadows: [
+                    Shadow(
+                      color: Color(0xFF818CF8),
+                      blurRadius: 10,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

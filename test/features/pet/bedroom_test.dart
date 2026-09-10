@@ -70,6 +70,7 @@ void main() {
       find.image(const AssetImage(GameAssets.bedroomSleepBackground)),
       findsOneWidget,
     );
+    expect(find.text('Zzz...'), findsOneWidget);
 
     await tester.tap(find.image(const AssetImage(GameAssets.lampNavigationButton)));
     await tester.pump();
@@ -78,5 +79,6 @@ void main() {
       find.image(const AssetImage(GameAssets.bedroomRoomBackground)),
       findsOneWidget,
     );
+    expect(find.text('Zzz...'), findsNothing);
   });
 }
