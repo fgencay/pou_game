@@ -21,6 +21,15 @@ void main() {
     },
   );
 
+  test('can buy burger and deduct correct coin amount', () {
+    final purchases = FoodPurchase();
+    expect(purchases.buy(Food.burger), isTrue);
+    expect(purchases.coins, 215);
+    expect(purchases.selected, Food.burger);
+    expect(purchases.quantity(Food.burger), 1);
+  });
+
+
   test('insufficient funds never change balance, selection or quantities', () {
     final purchases = FoodPurchase();
     for (var i = 0; i < 10; i++) {

@@ -3,6 +3,10 @@ class GameAssets {
 
   static const homeRoomBackground = 'assets/images/backgrounds/home_room.png';
   static const kitchenRoomBackground = 'assets/images/backgrounds/kitchen.png';
+  static const bathroomRoomBackground =
+      'assets/images/backgrounds/bathroom.png';
+  static const bedroomRoomBackground =
+      'assets/images/backgrounds/bedroom.png';
   static const fridgeIcon = 'assets/images/ui/navigation/fridge.png';
   static const apple = 'assets/images/items/food/apple.png';
   static const coinIcon = 'assets/images/ui/coin.png';
@@ -15,7 +19,16 @@ class GameAssets {
       'assets/images/ui/navigation/joystick.png';
   static const shopNavigationButton =
       'assets/images/ui/navigation/wardrobe.png';
+  static const toiletNavigationButton =
+      'assets/images/ui/navigation/tuvalet.png';
+  static const lampNavigationButton =
+      'assets/images/ui/navigation/lamba.png';
   static const catIdle = 'pets/cat/cat_idle.png';
   static const catBlink = 'pets/cat/cat_blink.png';
   static const catHappy = 'pets/cat/cat_happy.png';
+  static const catEating = 'pets/cat/yemekli.png';
+  static const dogIdle = 'pets/cat/dog_idle.png';
+  static const dogBlink = 'pets/cat/dog_blink.png';
+  static const dogHappy = 'pets/cat/dog_happy.png';
+  static const dogEating = 'pets/cat/kopekyemekli.png';
 }

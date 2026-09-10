@@ -133,10 +133,25 @@ class _TetrisScreenState extends State<TetrisScreen>
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 24),
-            FilledButton.icon(
-              onPressed: _collect,
-              icon: const Icon(Icons.check_rounded),
-              label: const Text('Collect'),
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              alignment: WrapAlignment.center,
+              children: [
+                FilledButton.icon(
+                  onPressed: _collect,
+                  icon: const Icon(Icons.check_rounded),
+                  label: const Text('Collect'),
+                ),
+                OutlinedButton.icon(
+                  onPressed: () {
+                    _replayAfterCollect = true;
+                    _collect();
+                  },
+                  icon: const Icon(Icons.refresh_rounded),
+                  label: const Text('Play Again'),
+                ),
+              ],
             ),
           ],
         ),

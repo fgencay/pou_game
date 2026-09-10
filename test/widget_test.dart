@@ -50,8 +50,6 @@ void main() {
     );
     expect(find.text('Pou Game'), findsNothing);
     expect(find.text('Home'), findsOneWidget);
-    await tester.tap(find.byIcon(Icons.chevron_left_rounded));
-    await tester.pump(const Duration(milliseconds: 150));
     final gameFinder = find.byWidgetPredicate((widget) => widget is GameWidget);
     final originalGame = tester.widget<GameWidget>(gameFinder).game;
     final originalRect = tester.getRect(gameFinder);
@@ -61,6 +59,8 @@ void main() {
     final gamesRect = tester.getRect(
       find.image(const AssetImage(GameAssets.joystickNavigationButton)),
     );
+    await tester.tap(find.byIcon(Icons.chevron_left_rounded));
+    await tester.pump(const Duration(milliseconds: 150));
 
     await tester.tap(find.byIcon(Icons.chevron_right_rounded));
     await tester.pump(const Duration(milliseconds: 150));
@@ -82,7 +82,20 @@ void main() {
     );
     expect(tester.widget<GameWidget>(gameFinder).game, same(originalGame));
     expect(tester.getRect(gameFinder), originalRect);
+
     await tester.tap(find.byIcon(Icons.chevron_right_rounded));
+    await tester.pump(const Duration(milliseconds: 150));
+    expect(find.text('Bathroom'), findsWidgets);
+    expect(
+      find.image(const AssetImage(GameAssets.bathroomRoomBackground)),
+      findsOneWidget,
+    );
+    expect(
+      find.image(const AssetImage(GameAssets.toiletNavigationButton)),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byIcon(Icons.chevron_left_rounded));
     await tester.pump(const Duration(milliseconds: 150));
     expect(find.text('Kitchen'), findsOneWidget);
     await tester.tap(find.byIcon(Icons.chevron_left_rounded));

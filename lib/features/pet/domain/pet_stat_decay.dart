@@ -13,6 +13,10 @@ class PetStatDecay {
 
   PetStats feed(PetStats stats) => stats.copyWith(hunger: GameConfig.maxStat);
 
+  PetStats clean(PetStats stats) => stats.copyWith(cleanliness: GameConfig.maxStat);
+
+  PetStats rest(PetStats stats) => stats.copyWith(energy: GameConfig.maxStat);
+
   PetStats apply(PetStats currentStats, Duration elapsed) {
     if (elapsed <= Duration.zero) {
       return currentStats;

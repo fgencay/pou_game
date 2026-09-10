@@ -3,6 +3,10 @@ import '../widgets/pet_progress_dialog.dart';
 import '../../features/economy/models/play_session.dart';
 import 'game_room_screen.dart';
 import 'tetris_screen.dart';
+import 'flappy_cube_screen.dart';
+import '../../features/pet/models/pet_inventory.dart';
+import '../../features/pet/models/pet_type.dart';
+import '../widgets/pet_shop_dialog.dart';
 
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +23,7 @@ import '../../features/pet/domain/pet_stat_decay.dart';
 import '../widgets/fridge_shop.dart';
 import '../../features/economy/models/food_purchase.dart';
 
-enum PetRoom { home, kitchen }
+enum PetRoom { home, kitchen, bathroom, bedroom }
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -37,6 +41,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final FoodPurchase _purchases = FoodPurchase();
+  final PetInventory _petInventory = PetInventory();
   late PlayerProgress _progress = widget.playerProgress;
   late final PetGame _game = PetGame(onTimeElapsed: _decayHunger);
   final GlobalKey _petPanelKey = GlobalKey();
@@ -44,6 +49,60 @@ class _HomeScreenState extends State<HomeScreen> {
   PetStats petStats = PetStats();
   late PetRoom _room = widget.initialRoom;
   bool get _isKitchen => _room == PetRoom.kitchen;
+  bool get _isBathroom => _room == PetRoom.bathroom;
+  bool get _isBedroom => _room == PetRoom.bedroom;
+
+  String get _roomBackground {
+    switch (_room) {
+      case PetRoom.kitchen:
+        return GameAssets.kitchenRoomBackground;
+      case PetRoom.bathroom:
+        return GameAssets.bathroomRoomBackground;
+      case PetRoom.bedroom:
+        return GameAssets.bedroomRoomBackground;
+      case PetRoom.home:
+        return GameAssets.homeRoomBackground;
+    }
+  }
+
+  String get _roomName {
+    switch (_room) {
+      case PetRoom.kitchen:
+        return 'Kitchen';
+      case PetRoom.bathroom:
+        return 'Bathroom';
+      case PetRoom.bedroom:
+        return 'Bedroom';
+      case PetRoom.home:
+        return 'Home';
+    }
+  }
+
+  VoidCallback? get _onPreviousRoom {
+    switch (_room) {
+      case PetRoom.home:
+        return null;
+      case PetRoom.kitchen:
+        return () => setState(() => _room = PetRoom.home);
+      case PetRoom.bathroom:
+        return () => setState(() => _room = PetRoom.kitchen);
+      case PetRoom.bedroom:
+        return () => setState(() => _room = PetRoom.bathroom);
+    }
+  }
+
+  VoidCallback? get _onNextRoom {
+    switch (_room) {
+      case PetRoom.home:
+        return () => setState(() => _room = PetRoom.kitchen);
+      case PetRoom.kitchen:
+        return () => setState(() => _room = PetRoom.bathroom);
+      case PetRoom.bathroom:
+        return () => setState(() => _room = PetRoom.bedroom);
+      case PetRoom.bedroom:
+        return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,9 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
         fit: StackFit.expand,
         children: [
           Image.asset(
-            _isKitchen
-                ? GameAssets.kitchenRoomBackground
-                : GameAssets.homeRoomBackground,
+            _roomBackground,
             fit: BoxFit.cover,
           ),
           DecoratedBox(
@@ -99,13 +156,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       child: RoomNavigation(
-                        roomName: _isKitchen ? 'Kitchen' : 'Home',
-                        onPrevious: _isKitchen
-                            ? () => setState(() => _room = PetRoom.home)
-                            : null,
-                        onNext: _isKitchen
-                            ? null
-                            : () => setState(() => _room = PetRoom.kitchen),
+                        roomName: _roomName,
+                        onPrevious: _onPreviousRoom,
+                        onNext: _onNextRoom,
                       ),
                     ),
                   ],
@@ -117,10 +170,13 @@ class _HomeScreenState extends State<HomeScreen> {
             alignment: Alignment.bottomCenter,
             child: _BottomNavigationOverlay(
               height: bottomNavigationHeight,
-              isKitchen: _isKitchen,
+              room: _room,
               food: _purchases.selected,
               onFridgePressed: _openFridge,
               onGamesPressed: _openGames,
+              onToiletPressed: _cleanPet,
+              onLampPressed: _sleepPet,
+              onShopPressed: _openPetShop,
               foodCount: _purchases.quantity(_purchases.selected),
               onFoodDropped: _feedAt,
             ),
@@ -134,6 +190,16 @@ class _HomeScreenState extends State<HomeScreen> {
     if (!mounted) return;
     final next = _statRules.applyHunger(petStats, seconds);
     if (next != petStats) setState(() => petStats = next);
+  }
+
+  void _cleanPet() {
+    setState(() => petStats = _statRules.clean(petStats));
+    _game.reactToFood();
+  }
+
+  void _sleepPet() {
+    setState(() => petStats = _statRules.rest(petStats));
+    _game.reactToFood();
   }
 
   void _feedAt(Food food, Offset globalPoint) {
@@ -167,20 +233,32 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _openGames() async {
     _game.pauseEngine();
     try {
-      final play = await showDialog<bool>(
+      final play = await showDialog<dynamic>(
         context: context,
         builder: (_) => const GameRoomScreen(),
       );
-      if (play == true && mounted) {
-        await Navigator.push(
-          context,
-          MaterialPageRoute<void>(
-            builder: (_) => TetrisScreen(
-              initialEnergy: petStats.energy,
-              onReward: _applyPlayReward,
+      if (play != null && mounted) {
+        if (play == MiniGameType.flappyCube) {
+          await Navigator.push(
+            context,
+            MaterialPageRoute<void>(
+              builder: (_) => FlappyCubeScreen(
+                initialEnergy: petStats.energy,
+                onReward: _applyPlayReward,
+              ),
             ),
-          ),
-        );
+          );
+        } else {
+          await Navigator.push(
+            context,
+            MaterialPageRoute<void>(
+              builder: (_) => TetrisScreen(
+                initialEnergy: petStats.energy,
+                onReward: _applyPlayReward,
+              ),
+            ),
+          );
+        }
       }
     } finally {
       if (mounted) _game.resumeEngine();
@@ -196,6 +274,38 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _purchases.buy(food);
     });
+  }
+
+  Future<void> _openPetShop() async {
+    _game.pauseEngine();
+    try {
+      final pet = await showDialog<PetType>(
+        context: context,
+        builder: (_) => PetShopDialog(
+          coins: _purchases.coins,
+          inventory: _petInventory,
+        ),
+      );
+      if (!mounted || pet == null) return;
+
+      if (!_petInventory.isOwned(pet)) {
+        if (_purchases.coins >= pet.price) {
+          setState(() {
+            _petInventory.buy(pet, _purchases.coins, (price) {
+              _purchases.spendCoins(price);
+            });
+          });
+          _game.setPetType(pet);
+        }
+      } else {
+        setState(() {
+          _petInventory.select(pet);
+        });
+        _game.setPetType(pet);
+      }
+    } finally {
+      if (mounted) _game.resumeEngine();
+    }
   }
 
   double _bottomNavigationHeight(BuildContext context) {
@@ -502,17 +612,23 @@ class _OutlinedAmountText extends StatelessWidget {
 class _BottomNavigationOverlay extends StatelessWidget {
   const _BottomNavigationOverlay({
     required this.height,
-    required this.isKitchen,
+    required this.room,
     required this.food,
     required this.onFridgePressed,
     required this.onGamesPressed,
+    required this.onToiletPressed,
+    required this.onLampPressed,
+    required this.onShopPressed,
     required this.foodCount,
     required this.onFoodDropped,
   });
-  final bool isKitchen;
+  final PetRoom room;
   final Food food;
   final VoidCallback onFridgePressed;
   final VoidCallback onGamesPressed;
+  final VoidCallback onToiletPressed;
+  final VoidCallback onLampPressed;
+  final VoidCallback onShopPressed;
   final int foodCount;
   final void Function(Food, Offset) onFoodDropped;
 
@@ -544,7 +660,7 @@ class _BottomNavigationOverlay extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            if (isKitchen)
+            if (room == PetRoom.kitchen)
               SizedBox(
                 width: iconSize + 28,
                 child: Column(
@@ -560,23 +676,48 @@ class _BottomNavigationOverlay extends StatelessWidget {
                   ],
                 ),
               )
-            else
+            else if (room == PetRoom.home)
               _NavigationImageItem(
                 assetPath: GameAssets.joystickNavigationButton,
                 label: 'Games',
                 iconSize: iconSize,
                 labelSize: labelSize,
                 onPressed: onGamesPressed,
+              )
+            else
+              SizedBox(width: iconSize + 28),
+            if (room == PetRoom.kitchen)
+              _NavigationImageItem(
+                assetPath: GameAssets.fridgeIcon,
+                label: 'Fridge',
+                iconSize: iconSize,
+                labelSize: labelSize,
+                onPressed: onFridgePressed,
+              )
+            else if (room == PetRoom.bathroom)
+              _NavigationImageItem(
+                assetPath: GameAssets.toiletNavigationButton,
+                label: 'Bathroom',
+                iconSize: iconSize,
+                labelSize: labelSize,
+                onPressed: onToiletPressed,
+              )
+            else if (room == PetRoom.bedroom)
+              _NavigationImageItem(
+                assetPath: GameAssets.lampNavigationButton,
+                label: 'Bedroom',
+                iconSize: iconSize,
+                labelSize: labelSize,
+                onPressed: onLampPressed,
+              )
+            else
+              _NavigationImageItem(
+                assetPath: GameAssets.shopNavigationButton,
+                label: 'Shop',
+                iconSize: iconSize,
+                labelSize: labelSize,
+                onPressed: onShopPressed,
               ),
-            _NavigationImageItem(
-              assetPath: isKitchen
-                  ? GameAssets.fridgeIcon
-                  : GameAssets.shopNavigationButton,
-              label: isKitchen ? 'Fridge' : 'Shop',
-              iconSize: iconSize,
-              labelSize: labelSize,
-              onPressed: isKitchen ? onFridgePressed : () {},
-            ),
           ],
         ),
       ),

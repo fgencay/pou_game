@@ -3,9 +3,10 @@ import 'package:flame/events.dart';
 
 const _blinkDuration = 0.18;
 const _happyDuration = 1.45;
+const _eatingDuration = 0.8;
 const _blinkDelays = [2.8, 4.1, 3.4, 5.0];
 
-enum CatVisualState { idle, blink, happy }
+enum CatVisualState { idle, blink, happy, eating }
 
 class PetComponent extends SpriteComponent with TapCallbacks, DragCallbacks {
   PetComponent({
@@ -25,6 +26,7 @@ class PetComponent extends SpriteComponent with TapCallbacks, DragCallbacks {
   CatVisualState _visualState = CatVisualState.idle;
   double _blinkTimer = _blinkDelays.first;
   double _happyTimer = 0;
+  double _eatingTimer = 0;
   int _blinkDelayIndex = 0;
 
   CatVisualState get visualState => _visualState;
@@ -32,6 +34,14 @@ class PetComponent extends SpriteComponent with TapCallbacks, DragCallbacks {
   @override
   void update(double dt) {
     super.update(dt);
+
+    if (_visualState == CatVisualState.eating) {
+      _eatingTimer -= dt;
+      if (_eatingTimer <= 0) {
+        showHappy();
+      }
+      return;
+    }
 
     if (_visualState == CatVisualState.happy) {
       _happyTimer -= dt;
@@ -90,6 +100,22 @@ class PetComponent extends SpriteComponent with TapCallbacks, DragCallbacks {
   void showHappy() {
     _happyTimer = _happyDuration;
     _setVisualState(CatVisualState.happy);
+  }
+
+  void showEatingThenHappy() {
+    _eatingTimer = _eatingDuration;
+    _setVisualState(CatVisualState.eating);
+  }
+
+  void updatePetType({
+    required Map<CatVisualState, Sprite> sprites,
+    required Vector2 sourceSize,
+  }) {
+    _sprites.clear();
+    _sprites.addAll(sprites);
+    _sourceSize.setFrom(sourceSize);
+    _setVisualState(CatVisualState.idle);
+    resizeToHeight(size.y);
   }
 
   void _scheduleNextBlink() {
