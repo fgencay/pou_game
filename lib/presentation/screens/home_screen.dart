@@ -182,7 +182,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           if (_isSleeping)
             Positioned(
-              top: MediaQuery.paddingOf(context).top + 230,
+              top: MediaQuery.paddingOf(context).top + 185,
               left: 0,
               right: 0,
               child: const IgnorePointer(
