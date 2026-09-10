@@ -1,4 +1,5 @@
 import 'dart:ui' as ui;
+import 'package:video_player/video_player.dart';
 import '../widgets/pet_progress_dialog.dart';
 import '../../features/economy/models/play_session.dart';
 import 'game_room_screen.dart';
@@ -49,6 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
   PetStats petStats = PetStats();
   late PetRoom _room = widget.initialRoom;
   bool _isSleeping = false;
+  bool _isPlayingToiletVideo = false;
   bool get _isKitchen => _room == PetRoom.kitchen;
   bool get _isBathroom => _room == PetRoom.bathroom;
   bool get _isBedroom => _room == PetRoom.bedroom;
@@ -57,6 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _room = newRoom;
       _isSleeping = false;
+      _isPlayingToiletVideo = false;
     });
     _game.setPetVisible(true);
   }
@@ -206,6 +209,12 @@ class _HomeScreenState extends State<HomeScreen> {
               onFoodDropped: _feedAt,
             ),
           ),
+          if (_isPlayingToiletVideo)
+            Positioned.fill(
+              child: _ToiletVideoOverlay(
+                onFinished: _onToiletVideoFinished,
+              ),
+            ),
         ],
       ),
     );
@@ -222,7 +231,17 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _cleanPet() {
-    setState(() => petStats = _statRules.clean(petStats));
+    setState(() {
+      _isPlayingToiletVideo = true;
+    });
+  }
+
+  void _onToiletVideoFinished() {
+    if (!mounted) return;
+    setState(() {
+      _isPlayingToiletVideo = false;
+      petStats = _statRules.clean(petStats);
+    });
     _game.reactToFood();
   }
 
@@ -934,6 +953,90 @@ class _SleepingZzzWidgetState extends State<_SleepingZzzWidget>
           ),
         );
       },
+    );
+  }
+}
+
+class _ToiletVideoOverlay extends StatefulWidget {
+  const _ToiletVideoOverlay({required this.onFinished});
+
+  final VoidCallback onFinished;
+
+  @override
+  State<_ToiletVideoOverlay> createState() => _ToiletVideoOverlayState();
+}
+
+class _ToiletVideoOverlayState extends State<_ToiletVideoOverlay> {
+  VideoPlayerController? _controller;
+  bool _initialized = false;
+  bool _finishedCalled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    try {
+      final controller = VideoPlayerController.asset(GameAssets.catToiletVideo);
+      _controller = controller;
+      controller.initialize().then((_) {
+        if (!mounted) return;
+        setState(() {
+          _initialized = true;
+        });
+        controller.play();
+      }).catchError((_) {
+        _callFinished();
+      });
+
+      controller.addListener(_videoListener);
+    } catch (_) {
+      _callFinished();
+    }
+  }
+
+  void _videoListener() {
+    final controller = _controller;
+    if (controller != null &&
+        controller.value.isInitialized &&
+        !controller.value.isPlaying &&
+        controller.value.position >= controller.value.duration) {
+      _callFinished();
+    }
+  }
+
+  void _callFinished() {
+    if (!_finishedCalled) {
+      _finishedCalled = true;
+      widget.onFinished();
+    }
+  }
+
+  @override
+  void dispose() {
+    final controller = _controller;
+    if (controller != null) {
+      try {
+        controller.removeListener(_videoListener);
+        controller.dispose();
+      } catch (_) {}
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = _controller;
+    if (!_initialized || controller == null) {
+      return const SizedBox.expand();
+    }
+    return SizedBox.expand(
+      child: FittedBox(
+        fit: BoxFit.cover,
+        child: SizedBox(
+          width: controller.value.size.width,
+          height: controller.value.size.height,
+          child: VideoPlayer(controller),
+        ),
+      ),
     );
   }
 }
