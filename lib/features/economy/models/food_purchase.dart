@@ -2,18 +2,26 @@ import 'package:flutter/material.dart';
 import '../../../core/config/game_assets.dart';
 
 enum Food {
-  apple('Apple', 10, asset: GameAssets.apple),
-  fish('Fish', 25, icon: Icons.set_meal, color: Color(0xFF529DA6)),
-  bread('Bread', 15, icon: Icons.bakery_dining, color: Color(0xFFC79047)),
-  egg('Egg', 12, icon: Icons.egg_alt, color: Color(0xFFE7AD38)),
-  pizza('Pizza', 30, icon: Icons.local_pizza, color: Color(0xFFD77339)),
-  cookie('Cookie', 18, icon: Icons.cookie, color: Color(0xFFA97852)),
-  iceCream('Ice cream', 20, icon: Icons.icecream, color: Color(0xFFD586A3)),
-  burger('Burger', 35, icon: Icons.lunch_dining, color: Color(0xFFD36224));
+  apple('Apple', 10, requiredLevel: 1, asset: GameAssets.apple),
+  bread('Bread', 15, requiredLevel: 1, icon: Icons.bakery_dining, color: Color(0xFFC79047)),
+  egg('Egg', 12, requiredLevel: 1, icon: Icons.egg_alt, color: Color(0xFFE7AD38)),
+  cookie('Cookie', 18, requiredLevel: 2, icon: Icons.cookie, color: Color(0xFFA97852)),
+  iceCream('Ice cream', 20, requiredLevel: 3, icon: Icons.icecream, color: Color(0xFFD586A3)),
+  fish('Fish', 25, requiredLevel: 1, icon: Icons.set_meal, color: Color(0xFF529DA6)),
+  pizza('Pizza', 30, requiredLevel: 4, icon: Icons.local_pizza, color: Color(0xFFD77339)),
+  burger('Burger', 35, requiredLevel: 5, icon: Icons.lunch_dining, color: Color(0xFFD36224));
 
-  const Food(this.label, this.price, {this.asset, this.icon, this.color});
+  const Food(
+    this.label,
+    this.price, {
+    this.requiredLevel = 1,
+    this.asset,
+    this.icon,
+    this.color,
+  });
   final String label;
   final int price;
+  final int requiredLevel;
   final String? asset;
   final IconData? icon;
   final Color? color;
@@ -54,7 +62,8 @@ class FoodPurchase {
     return true;
   }
 
-  bool buy(Food food) {
+  bool buy(Food food, {int playerLevel = 100}) {
+    if (playerLevel < food.requiredLevel) return false;
     if (_coins < food.price) return false;
     _coins -= food.price;
     _quantities[food] = quantity(food) + 1;

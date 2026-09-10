@@ -21,6 +21,17 @@ void main() {
     },
   );
 
+  test('cannot buy level locked food if player level is lower than required level', () {
+    final purchases = FoodPurchase();
+    expect(purchases.buy(Food.burger, playerLevel: 1), isFalse);
+    expect(purchases.coins, 250);
+    expect(purchases.quantity(Food.burger), 0);
+
+    expect(purchases.buy(Food.burger, playerLevel: 5), isTrue);
+    expect(purchases.coins, 215);
+    expect(purchases.quantity(Food.burger), 1);
+  });
+
   test('can buy burger and deduct correct coin amount', () {
     final purchases = FoodPurchase();
     expect(purchases.buy(Food.burger), isTrue);
@@ -56,12 +67,14 @@ void main() {
       await tester.pump();
       await tester.tap(find.image(const AssetImage(GameAssets.fridgeIcon)));
       await tester.pump(const Duration(milliseconds: 300));
+      await tester.ensureVisible(find.byKey(const ValueKey('buy-fish')));
       await tester.tap(find.byKey(const ValueKey('buy-fish')));
       await tester.pump(const Duration(milliseconds: 300));
       expect(find.text('225'), findsNWidgets(2));
       expect(tester.widget<FoodItem>(find.byType(FoodItem)).food, Food.fish);
       await tester.tap(find.image(const AssetImage(GameAssets.fridgeIcon)));
       await tester.pump(const Duration(milliseconds: 300));
+      await tester.ensureVisible(find.byKey(const ValueKey('buy-apple')));
       await tester.tap(find.byKey(const ValueKey('buy-apple')));
       await tester.pump(const Duration(milliseconds: 300));
       expect(find.text('215'), findsNWidgets(2));

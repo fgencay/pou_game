@@ -328,11 +328,14 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _openFridge() async {
     final food = await showDialog<Food>(
       context: context,
-      builder: (_) => FridgeShop(coins: _purchases.coins),
+      builder: (_) => FridgeShop(
+        coins: _purchases.coins,
+        level: _progress.level,
+      ),
     );
     if (!mounted || food == null) return;
     setState(() {
-      _purchases.buy(food);
+      _purchases.buy(food, playerLevel: _progress.level);
     });
   }
 
