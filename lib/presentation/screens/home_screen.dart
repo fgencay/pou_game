@@ -43,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final FoodPurchase _purchases = FoodPurchase();
   final PetInventory _petInventory = PetInventory();
   late PlayerProgress _progress = widget.playerProgress;
-  late final PetGame _game = PetGame(onTimeElapsed: _decayHunger);
+  late final PetGame _game = PetGame(onTimeElapsed: _updateStatsOverTime);
   final GlobalKey _petPanelKey = GlobalKey();
   static const _statRules = PetStatDecay();
   PetStats petStats = PetStats();
@@ -200,9 +200,13 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _decayHunger(double seconds) {
+  void _updateStatsOverTime(double seconds) {
     if (!mounted) return;
-    final next = _statRules.applyHunger(petStats, seconds);
+    final next = _statRules.updateTime(
+      petStats,
+      seconds,
+      isSleeping: _isSleeping,
+    );
     if (next != petStats) setState(() => petStats = next);
   }
 
@@ -214,9 +218,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void _sleepPet() {
     setState(() {
       _isSleeping = !_isSleeping;
-      if (_isSleeping) {
-        petStats = _statRules.rest(petStats);
-      }
     });
     _game.setPetVisible(!_isSleeping);
   }

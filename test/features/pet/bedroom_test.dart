@@ -14,6 +14,20 @@ void main() {
     expect(restedStats.energy, 100);
   });
 
+  test('PetStatDecay updateTime gradually restores energy when sleeping', () {
+    const rules = PetStatDecay();
+    final tiredStats = PetStats(energy: 50);
+    final nextStats = rules.updateTime(tiredStats, 1.0, isSleeping: true);
+    expect(nextStats.energy, 62.0);
+  });
+
+  test('PetStatDecay updateTime decays energy when awake', () {
+    const rules = PetStatDecay();
+    final fullStats = PetStats(energy: 100);
+    final nextStats = rules.updateTime(fullStats, 1.0, isSleeping: false);
+    expect(nextStats.energy, lessThan(100.0));
+  });
+
   testWidgets('can navigate to Bedroom and see lamp icon on bottom right', (tester) async {
     tester.view.physicalSize = const Size(360, 640);
     tester.view.devicePixelRatio = 1;

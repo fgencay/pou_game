@@ -17,6 +17,22 @@ class PetStatDecay {
 
   PetStats rest(PetStats stats) => stats.copyWith(energy: GameConfig.maxStat);
 
+  PetStats updateTime(PetStats stats, double seconds, {bool isSleeping = false}) {
+    if (seconds <= 0) return stats;
+
+    final hungerDecay = GameConfig.hungerDecayPerMinute * seconds / 60;
+    final nextHunger = (stats.hunger - hungerDecay).clamp(GameConfig.minStat, GameConfig.maxStat);
+
+    if (isSleeping) {
+      final nextEnergy = (stats.energy + 12.0 * seconds).clamp(GameConfig.minStat, GameConfig.maxStat);
+      return stats.copyWith(hunger: nextHunger, energy: nextEnergy);
+    } else {
+      final energyDecay = (GameConfig.energyDecayPerMinute * seconds / 60) + (0.12 * seconds);
+      final nextEnergy = (stats.energy - energyDecay).clamp(GameConfig.minStat, GameConfig.maxStat);
+      return stats.copyWith(hunger: nextHunger, energy: nextEnergy);
+    }
+  }
+
   PetStats apply(PetStats currentStats, Duration elapsed) {
     if (elapsed <= Duration.zero) {
       return currentStats;
