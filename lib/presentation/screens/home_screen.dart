@@ -55,6 +55,24 @@ class _HomeScreenState extends State<HomeScreen> {
   bool get _isBathroom => _room == PetRoom.bathroom;
   bool get _isBedroom => _room == PetRoom.bedroom;
 
+  bool get _isPetSad {
+    final health = (petStats.hunger + petStats.energy + petStats.cleanliness) / 3;
+    return petStats.hunger <= 65.0 ||
+        health <= 65.0 ||
+        petStats.cleanliness <= 65.0 ||
+        petStats.energy <= 65.0;
+  }
+
+  void _syncPetSadState() {
+    _game.setSad(_isPetSad);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _syncPetSadState();
+  }
+
   void _setRoom(PetRoom newRoom) {
     setState(() {
       _room = newRoom;
@@ -231,7 +249,10 @@ class _HomeScreenState extends State<HomeScreen> {
       seconds,
       isSleeping: _isSleeping,
     );
-    if (next != petStats) setState(() => petStats = next);
+    if (next != petStats) {
+      setState(() => petStats = next);
+      _syncPetSadState();
+    }
   }
 
   void _cleanPet() {
@@ -252,6 +273,7 @@ class _HomeScreenState extends State<HomeScreen> {
       petStats = _statRules.clean(petStats);
       _progress = _progress.earnXp(25);
     });
+    _syncPetSadState();
     _game.setPetVisible(true);
   }
 
@@ -270,7 +292,9 @@ class _HomeScreenState extends State<HomeScreen> {
       return;
     }
     if (!_purchases.consume(food)) return;
-    setState(() => petStats = _statRules.feed(petStats));
+    final fillAmount = (food.price * 0.8).clamp(20.0, 35.0);
+    setState(() => petStats = _statRules.feed(petStats, amount: fillAmount));
+    _syncPetSadState();
     _game.reactToFood();
   }
 
@@ -288,6 +312,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _progress = _progress.earnXp(reward.xp);
       petStats = petStats.copyWith(energy: petStats.energy - reward.energy);
     });
+    _syncPetSadState();
   }
 
   Future<void> _openGames() async {
@@ -359,12 +384,14 @@ class _HomeScreenState extends State<HomeScreen> {
             });
           });
           _game.setPetType(pet);
+          _syncPetSadState();
         }
       } else {
         setState(() {
           _petInventory.select(pet);
         });
         _game.setPetType(pet);
+        _syncPetSadState();
       }
     } finally {
       if (mounted) _game.resumeEngine();

@@ -15,7 +15,15 @@ class PetGame extends FlameGame {
   double _elapsed = 0;
   late final PetComponent _pet;
   PetType _currentPet;
+  bool _isSad = false;
   final Map<PetType, Map<CatVisualState, Sprite>> _petSprites = {};
+
+  void setSad(bool isSad) {
+    _isSad = isSad;
+    if (isLoaded) {
+      _pet.setSad(isSad);
+    }
+  }
 
   bool canFeedAt(Offset point) {
     if (!isLoaded) return false;
@@ -47,6 +55,7 @@ class PetGame extends FlameGame {
     _pet.updatePetType(
       sprites: Map.of(_petSprites[petType]!),
       sourceSize: sourceSize,
+      petType: petType,
     );
     _layoutPet();
   }
@@ -58,12 +67,14 @@ class PetGame extends FlameGame {
     final blinkImage = await images.load(petType.blinkAsset);
     final happyImage = await images.load(petType.happyAsset);
     final eatingImage = await images.load(petType.eatingAsset);
+    final sadImage = await images.load(petType.sadAsset);
 
     _petSprites[petType] = {
       CatVisualState.idle: Sprite(idleImage),
       CatVisualState.blink: Sprite(blinkImage),
       CatVisualState.happy: Sprite(happyImage),
       CatVisualState.eating: Sprite(eatingImage),
+      CatVisualState.sad: Sprite(sadImage),
     };
   }
 
@@ -94,6 +105,8 @@ class PetGame extends FlameGame {
     _pet = PetComponent(
       sprites: Map.of(_petSprites[_currentPet]!),
       sourceSize: sourceSize,
+      petType: _currentPet,
+      isSad: _isSad,
     );
 
     await add(_pet);

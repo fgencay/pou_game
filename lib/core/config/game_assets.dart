@@ -31,11 +31,15 @@ class GameAssets {
   static const catBlink = 'pets/cat/cat_blink.png';
   static const catHappy = 'pets/cat/cat_happy.png';
   static const catEating = 'pets/cat/yemekli.png';
+  static const catSad = 'pets/cat/cat_sad.png';
   static const dogIdle = 'pets/cat/dog_idle.png';
   static const dogBlink = 'pets/cat/dog_blink.png';
   static const dogHappy = 'pets/cat/dog_happy.png';
   static const dogEating = 'pets/cat/kopekyemekli.png';
+  static const dogSad = 'pets/cat/dog_sad.png';
   static const eatAudio = 'eat.mp3';
+  static const catHappyAudio = 'kedimir.mp3';
+  static const dogHappyAudio = 'kopekgulme.mp3';
   static const catToiletVideo = 'assets/videos/cat_toilet.mp4';
   static const dogToiletVideo = 'assets/videos/dog_toilet.mp4';
 }

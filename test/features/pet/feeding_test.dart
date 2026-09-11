@@ -13,8 +13,8 @@ void main() {
     'food fills hunger without exceeding 100; time only decreases hunger',
     () {
       const rules = PetStatDecay();
-      expect(rules.feed(PetStats(hunger: 20)).hunger, 100);
-      expect(rules.feed(PetStats()).hunger, 100);
+      expect(rules.feed(PetStats(hunger: 20), amount: 25).hunger, 45);
+      expect(rules.feed(PetStats(), amount: 25).hunger, 100);
       final after = rules.applyHunger(PetStats(), 60);
       expect(after.hunger, closeTo(99.55, 0.001));
       expect(after.energy, 100);

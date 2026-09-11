@@ -9,6 +9,8 @@ enum PetType {
     blinkAsset: GameAssets.catBlink,
     happyAsset: GameAssets.catHappy,
     eatingAsset: GameAssets.catEating,
+    sadAsset: GameAssets.catSad,
+    happyAudio: GameAssets.catHappyAudio,
   ),
   dog(
     id: 'dog',
@@ -18,6 +20,8 @@ enum PetType {
     blinkAsset: GameAssets.dogBlink,
     happyAsset: GameAssets.dogHappy,
     eatingAsset: GameAssets.dogEating,
+    sadAsset: GameAssets.dogSad,
+    happyAudio: GameAssets.dogHappyAudio,
   );
 
   const PetType({
@@ -28,6 +32,8 @@ enum PetType {
     required this.blinkAsset,
     required this.happyAsset,
     required this.eatingAsset,
+    required this.sadAsset,
+    required this.happyAudio,
   });
 
   final String id;
@@ -37,6 +43,8 @@ enum PetType {
   final String blinkAsset;
   final String happyAsset;
   final String eatingAsset;
+  final String sadAsset;
+  final String happyAudio;
 
   String get imageAssetPath => 'assets/images/$idleAsset';
 }
