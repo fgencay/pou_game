@@ -1032,6 +1032,7 @@ class _ToiletVideoOverlayState extends State<_ToiletVideoOverlay> {
   VideoPlayerController? _controller;
   AudioPlayer? _sifonAudioPlayer;
   Timer? _sifonTimer;
+  Timer? _completionTimer;
   bool _initialized = false;
   bool _finishedCalled = false;
   bool _sifonTriggered = false;
@@ -1051,6 +1052,13 @@ class _ToiletVideoOverlayState extends State<_ToiletVideoOverlay> {
         });
         controller.play();
         widget.onStarted?.call();
+
+        final duration = controller.value.duration;
+        if (duration > Duration.zero) {
+          _completionTimer = Timer(duration + const Duration(milliseconds: 500), () {
+            if (mounted) _callFinished();
+          });
+        }
       }).catchError((_) {
         _callFinished();
       });
@@ -1076,7 +1084,11 @@ class _ToiletVideoOverlayState extends State<_ToiletVideoOverlay> {
       _playSifonSound();
     }
 
-    if (!controller.value.isPlaying && position >= duration) {
+    final isCompleted = controller.value.isCompleted ||
+        (position >= duration && duration > Duration.zero) ||
+        (!controller.value.isPlaying && remaining <= const Duration(milliseconds: 500));
+
+    if (isCompleted) {
       _callFinished();
     }
   }
@@ -1101,12 +1113,14 @@ class _ToiletVideoOverlayState extends State<_ToiletVideoOverlay> {
   void _callFinished() {
     if (!_finishedCalled) {
       _finishedCalled = true;
+      _completionTimer?.cancel();
       widget.onFinished();
     }
   }
 
   @override
   void dispose() {
+    _completionTimer?.cancel();
     _sifonTimer?.cancel();
     try {
       _sifonAudioPlayer?.stop();
