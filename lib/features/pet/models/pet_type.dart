@@ -33,6 +33,17 @@ enum PetType {
     eatingAsset: GameAssets.birdEating,
     sadAsset: GameAssets.birdSad,
     happyAudio: GameAssets.birdHappyAudio,
+  ),
+  panda(
+    id: 'panda',
+    label: 'Panda',
+    price: 200,
+    idleAsset: GameAssets.pandaIdle,
+    blinkAsset: GameAssets.pandaBlink,
+    happyAsset: GameAssets.pandaHappy,
+    eatingAsset: GameAssets.pandaEating,
+    sadAsset: GameAssets.pandaSad,
+    happyAudio: GameAssets.pandaHappyAudio,
   );
 
   const PetType({
