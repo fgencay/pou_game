@@ -51,4 +51,5 @@ class GameAssets {
   static const catToiletVideo = 'assets/videos/cat_toilet.mp4';
   static const dogToiletVideo = 'assets/videos/dog_toilet.mp4';
   static const birdToiletVideo = 'assets/videos/bird_toilet.mp4';
+  static const sifonAudio = 'sifon.mp3';
 }

@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:ui' as ui;
+import 'package:audioplayers/audioplayers.dart';
 import 'package:video_player/video_player.dart';
 import '../widgets/pet_progress_dialog.dart';
 import '../../features/economy/models/play_session.dart';
@@ -1028,8 +1030,11 @@ class _ToiletVideoOverlay extends StatefulWidget {
 
 class _ToiletVideoOverlayState extends State<_ToiletVideoOverlay> {
   VideoPlayerController? _controller;
+  AudioPlayer? _sifonAudioPlayer;
+  Timer? _sifonTimer;
   bool _initialized = false;
   bool _finishedCalled = false;
+  bool _sifonTriggered = false;
 
   @override
   void initState() {
@@ -1037,8 +1042,10 @@ class _ToiletVideoOverlayState extends State<_ToiletVideoOverlay> {
     try {
       final controller = VideoPlayerController.asset(widget.videoAssetPath);
       _controller = controller;
+      controller.setVolume(0.0);
       controller.initialize().then((_) {
         if (!mounted) return;
+        controller.setVolume(0.0);
         setState(() {
           _initialized = true;
         });
@@ -1056,12 +1063,39 @@ class _ToiletVideoOverlayState extends State<_ToiletVideoOverlay> {
 
   void _videoListener() {
     final controller = _controller;
-    if (controller != null &&
-        controller.value.isInitialized &&
-        !controller.value.isPlaying &&
-        controller.value.position >= controller.value.duration) {
+    if (controller == null || !controller.value.isInitialized) return;
+
+    final duration = controller.value.duration;
+    final position = controller.value.position;
+    final remaining = duration - position;
+
+    if (!_sifonTriggered &&
+        remaining <= const Duration(seconds: 4) &&
+        remaining > Duration.zero) {
+      _sifonTriggered = true;
+      _playSifonSound();
+    }
+
+    if (!controller.value.isPlaying && position >= duration) {
       _callFinished();
     }
+  }
+
+  void _playSifonSound() {
+    try {
+      final player = AudioPlayer();
+      _sifonAudioPlayer = player;
+      player.play(AssetSource('audio/${GameAssets.sifonAudio}'));
+      _sifonTimer = Timer(const Duration(seconds: 3), () {
+        try {
+          player.stop();
+          player.dispose();
+        } catch (_) {}
+        if (_sifonAudioPlayer == player) {
+          _sifonAudioPlayer = null;
+        }
+      });
+    } catch (_) {}
   }
 
   void _callFinished() {
@@ -1073,6 +1107,13 @@ class _ToiletVideoOverlayState extends State<_ToiletVideoOverlay> {
 
   @override
   void dispose() {
+    _sifonTimer?.cancel();
+    try {
+      _sifonAudioPlayer?.stop();
+      _sifonAudioPlayer?.dispose();
+    } catch (_) {}
+    _sifonAudioPlayer = null;
+
     final controller = _controller;
     if (controller != null) {
       try {
