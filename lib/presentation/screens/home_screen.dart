@@ -90,13 +90,29 @@ class _HomeScreenState extends State<HomeScreen> {
         return GameAssets.bathroomRoomBackground;
       case PetRoom.bedroom:
         if (_isSleeping) {
-          return _petInventory.activePet == PetType.dog
-              ? GameAssets.bedroomSleepDogBackground
-              : GameAssets.bedroomSleepBackground;
+          switch (_petInventory.activePet) {
+            case PetType.dog:
+              return GameAssets.bedroomSleepDogBackground;
+            case PetType.bird:
+              return GameAssets.bedroomSleepBirdBackground;
+            case PetType.cat:
+              return GameAssets.bedroomSleepBackground;
+          }
         }
         return GameAssets.bedroomRoomBackground;
       case PetRoom.home:
         return GameAssets.homeRoomBackground;
+    }
+  }
+
+  String get _toiletVideoAsset {
+    switch (_petInventory.activePet) {
+      case PetType.dog:
+        return GameAssets.dogToiletVideo;
+      case PetType.bird:
+        return GameAssets.birdToiletVideo;
+      case PetType.cat:
+        return GameAssets.catToiletVideo;
     }
   }
 
@@ -159,9 +175,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (_isPlayingToiletVideo)
             Positioned.fill(
               child: _ToiletVideoOverlay(
-                videoAssetPath: _petInventory.activePet == PetType.dog
-                    ? GameAssets.dogToiletVideo
-                    : GameAssets.catToiletVideo,
+                videoAssetPath: _toiletVideoAsset,
                 onStarted: _onToiletVideoStarted,
                 onFinished: _onToiletVideoFinished,
               ),

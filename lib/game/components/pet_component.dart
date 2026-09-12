@@ -1,10 +1,9 @@
-import 'dart:ui';
+import 'package:flutter/rendering.dart';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 
-import '../../core/config/game_assets.dart';
 import '../../features/pet/models/pet_type.dart';
 
 const _blinkDuration = 0.18;
@@ -31,7 +30,12 @@ class PetComponent extends SpriteComponent with TapCallbacks, DragCallbacks {
          size: sourceSize,
          anchor: Anchor.center,
          autoResize: false,
-       );
+       ) {
+    paint.colorFilter = const ColorFilter.mode(
+      Color(0xFFFFF4EB),
+      BlendMode.modulate,
+    );
+  }
 
   final Map<CatVisualState, Sprite> _sprites;
   final Vector2 _sourceSize;
@@ -58,8 +62,44 @@ class PetComponent extends SpriteComponent with TapCallbacks, DragCallbacks {
   @override
   void render(Canvas canvas) {
     if (!isVisible) return;
+    _drawContactShadow(canvas);
     super.render(canvas);
   }
+
+  void _drawContactShadow(Canvas canvas) {
+    final outerShadowRect = Rect.fromCenter(
+      center: Offset(size.x * 0.50, size.y * 0.89),
+      width: size.x * 0.64,
+      height: size.y * 0.08,
+    );
+    final outerShadowPaint = Paint()
+      ..shader = RadialGradient(
+        colors: [
+          const Color(0xFF3E2B20).withValues(alpha: 0.24),
+          const Color(0xFF3E2B20).withValues(alpha: 0.09),
+          const Color(0xFF3E2B20).withValues(alpha: 0.0),
+        ],
+        stops: const [0.0, 0.55, 1.0],
+      ).createShader(outerShadowRect);
+    canvas.drawOval(outerShadowRect, outerShadowPaint);
+
+    final innerShadowRect = Rect.fromCenter(
+      center: Offset(size.x * 0.50, size.y * 0.90),
+      width: size.x * 0.44,
+      height: size.y * 0.04,
+    );
+    final innerShadowPaint = Paint()
+      ..shader = RadialGradient(
+        colors: [
+          const Color(0xFF2A1C14).withValues(alpha: 0.18),
+          const Color(0xFF2A1C14).withValues(alpha: 0.0),
+        ],
+        stops: const [0.0, 1.0],
+      ).createShader(innerShadowRect);
+    canvas.drawOval(innerShadowRect, innerShadowPaint);
+  }
+
+  bool _isBeingPetted = false;
 
   @override
   void update(double dt) {
@@ -74,10 +114,14 @@ class PetComponent extends SpriteComponent with TapCallbacks, DragCallbacks {
     }
 
     if (_visualState == CatVisualState.happy) {
-      _happyTimer -= dt;
-      if (_happyTimer <= 0) {
-        _setVisualState(CatVisualState.idle);
-        _scheduleNextBlink();
+      if (_isBeingPetted) {
+        _happyTimer = _happyDuration;
+      } else {
+        _happyTimer -= dt;
+        if (_happyTimer <= 0) {
+          _setVisualState(CatVisualState.idle);
+          _scheduleNextBlink();
+        }
       }
       return;
     }
@@ -115,17 +159,58 @@ class PetComponent extends SpriteComponent with TapCallbacks, DragCallbacks {
   @override
   void onTapDown(TapDownEvent event) {
     super.onTapDown(event);
+    _isBeingPetted = true;
     showHappy();
+  }
+
+  @override
+  void onTapUp(TapUpEvent event) {
+    super.onTapUp(event);
+    _isBeingPetted = false;
+    _happyTimer = _happyDuration;
+  }
+
+  @override
+  void onTapCancel(TapCancelEvent event) {
+    super.onTapCancel(event);
+    _isBeingPetted = false;
+    _happyTimer = _happyDuration;
   }
 
   @override
   void onDragStart(DragStartEvent event) {
     super.onDragStart(event);
+    _isBeingPetted = true;
     showHappy();
   }
 
   @override
+  void onDragUpdate(DragUpdateEvent event) {
+    super.onDragUpdate(event);
+    _isBeingPetted = true;
+    if (_visualState != CatVisualState.happy &&
+        _visualState != CatVisualState.eating) {
+      showHappy();
+    }
+  }
+
+  @override
+  void onDragEnd(DragEndEvent event) {
+    super.onDragEnd(event);
+    _isBeingPetted = false;
+    _happyTimer = _happyDuration;
+  }
+
+  @override
+  void onDragCancel(DragCancelEvent event) {
+    super.onDragCancel(event);
+    _isBeingPetted = false;
+    _happyTimer = _happyDuration;
+  }
+
+  @override
   void onRemove() {
+    _isBeingPetted = false;
     _stopHappySound();
     super.onRemove();
   }
@@ -161,6 +246,7 @@ class PetComponent extends SpriteComponent with TapCallbacks, DragCallbacks {
     try {
       _stopHappySound();
       final player = AudioPlayer();
+      player.setReleaseMode(ReleaseMode.loop);
       _happyAudioPlayer = player;
       player.play(AssetSource('audio/${_petType.happyAudio}'));
     } catch (_) {}

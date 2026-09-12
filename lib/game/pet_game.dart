@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 
-import '../core/config/game_assets.dart';
 import '../features/pet/models/pet_type.dart';
 import 'components/pet_component.dart';
 
