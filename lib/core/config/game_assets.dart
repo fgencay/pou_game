@@ -61,9 +61,9 @@ class GameAssets {
   static const eatAudio = 'eat.mp3';
   static const catHappyAudio = 'kedimir.mp3';
   static const dogHappyAudio = 'kopekgulme.mp3';
-  static const birdHappyAudio = 'kedimir.mp3';
+  static const birdHappyAudio = 'kus.mp3';
   static const pandaHappyAudio = 'kedimir.mp3';
-  static const rabbitHappyAudio = 'kedimir.mp3';
+  static const rabbitHappyAudio = 'rabbit.mp3';
   static const catToiletVideo = 'assets/videos/cat_toilet.mp4';
   static const dogToiletVideo = 'assets/videos/dog_toilet.mp4';
   static const birdToiletVideo = 'assets/videos/bird_toilet.mp4';
