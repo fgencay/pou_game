@@ -58,7 +58,7 @@ enum PetType {
   ),
   cat2(
     id: 'cat2',
-    label: 'Sarman',
+    label: 'Ginger Cat',
     price: 200,
     idleAsset: GameAssets.cat2Idle,
     blinkAsset: GameAssets.cat2Blink,
