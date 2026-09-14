@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pou_game/app/app.dart';
+import 'package:pou_game/app/routes.dart';
 import 'package:pou_game/core/config/game_assets.dart';
 import 'package:tetris_engine/tetris_engine.dart';
 
@@ -12,7 +13,7 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
-    await tester.pumpWidget(const PouGameApp());
+    await tester.pumpWidget(const PouGameApp(initialRoute: AppRoutes.home));
     await tester.pump();
     await tester.tap(
       find.image(const AssetImage(GameAssets.joystickNavigationButton)),

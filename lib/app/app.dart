@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../presentation/screens/bathroom_screen.dart';
 import '../presentation/screens/bedroom_screen.dart';
+import '../presentation/screens/character_selection_screen.dart';
 import '../presentation/screens/game_room_screen.dart';
 import '../presentation/screens/home_screen.dart';
 import '../presentation/screens/kitchen_screen.dart';
@@ -11,7 +12,12 @@ import 'routes.dart';
 import 'theme.dart';
 
 class PouGameApp extends StatelessWidget {
-  const PouGameApp({super.key});
+  const PouGameApp({
+    super.key,
+    this.initialRoute = AppRoutes.selectCharacter,
+  });
+
+  final String initialRoute;
 
   @override
   Widget build(BuildContext context) {
@@ -19,8 +25,9 @@ class PouGameApp extends StatelessWidget {
       title: 'Pou Game',
       debugShowCheckedModeBanner: false,
       theme: PouGameTheme.materialTheme,
-      initialRoute: AppRoutes.home,
+      initialRoute: initialRoute,
       routes: {
+        AppRoutes.selectCharacter: (_) => const CharacterSelectionScreen(),
         AppRoutes.home: (_) => const HomeScreen(),
         AppRoutes.kitchen: (_) => const KitchenScreen(),
         AppRoutes.bathroom: (_) => const BathroomScreen(),

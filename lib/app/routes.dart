@@ -1,6 +1,7 @@
 class AppRoutes {
   const AppRoutes._();
 
+  static const selectCharacter = '/select-character';
   static const home = '/';
   static const kitchen = '/kitchen';
   static const bathroom = '/bathroom';

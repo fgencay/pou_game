@@ -33,10 +33,11 @@ class HomeScreen extends StatefulWidget {
     super.key,
     this.playerProgress = const PlayerProgress(),
     this.initialRoom = PetRoom.home,
+    this.initialPet = PetType.cat,
   });
   final PlayerProgress playerProgress;
-
   final PetRoom initialRoom;
+  final PetType initialPet;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -44,9 +45,15 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final FoodPurchase _purchases = FoodPurchase();
-  final PetInventory _petInventory = PetInventory();
+  late final PetInventory _petInventory = PetInventory(
+    ownedPets: {widget.initialPet},
+    activePet: widget.initialPet,
+  );
   late PlayerProgress _progress = widget.playerProgress;
-  late final PetGame _game = PetGame(onTimeElapsed: _updateStatsOverTime);
+  late final PetGame _game = PetGame(
+    onTimeElapsed: _updateStatsOverTime,
+    initialPet: widget.initialPet,
+  );
   final GlobalKey _petPanelKey = GlobalKey();
   static const _statRules = PetStatDecay();
   PetStats petStats = PetStats();

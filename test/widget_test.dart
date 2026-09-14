@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:pou_game/app/app.dart';
+import 'package:pou_game/app/routes.dart';
 import 'package:pou_game/features/economy/models/player_progress.dart';
 import 'package:pou_game/presentation/screens/home_screen.dart';
 import 'package:pou_game/core/config/game_assets.dart';
@@ -41,7 +42,7 @@ void main() {
   testWidgets('opens home screen with the pet game area', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const PouGameApp());
+    await tester.pumpWidget(const PouGameApp(initialRoute: AppRoutes.home));
     await tester.pump();
 
     expect(
@@ -120,7 +121,7 @@ void main() {
   testWidgets('shows bottom image navigation panel', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const PouGameApp());
+    await tester.pumpWidget(const PouGameApp(initialRoute: AppRoutes.home));
     await tester.pump();
 
     expect(
