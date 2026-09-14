@@ -72,20 +72,10 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen> {
               ),
               child: Column(
                 children: [
-                  const SizedBox(height: GameSpacing.lg),
-                  // Header Title
+                  const SizedBox(height: GameSpacing.xl),
+                  // Header Title in Upper-Middle
                   const _OutlinedHeaderTitle(text: 'CHOOSE YOUR PET'),
-                  const SizedBox(height: 6),
-                  const Text(
-                    'Swipe to spin & choose your starter pet!',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF6B4E3D),
-                    ),
-                  ),
-                  const Spacer(flex: 3),
+                  const Spacer(flex: 2),
                   // 3D Circular Character Carousel
                   CircularCharacterCarousel(
                     key: _carouselKey,
@@ -94,10 +84,10 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen> {
                     onPetChanged: _onPetChanged,
                     height: carouselHeight,
                   ),
-                  const SizedBox(height: GameSpacing.md),
+                  const SizedBox(height: GameSpacing.lg),
                   // Character Name Badge
                   _SelectedPetBadge(pet: _selectedPet),
-                  const Spacer(flex: 2),
+                  const Spacer(flex: 3),
                   // Start Game Button
                   _StartGameButton(
                     onPressed: _startGame,
@@ -120,7 +110,7 @@ class _OutlinedHeaderTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const baseStyle = TextStyle(
-      fontSize: 26,
+      fontSize: 28,
       fontWeight: FontWeight.w900,
       letterSpacing: 1.5,
       shadows: [
@@ -161,58 +151,36 @@ class _SelectedPetBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        AnimatedSwitcher(
-          duration: const Duration(milliseconds: 250),
-          transitionBuilder: (child, animation) {
-            return ScaleTransition(scale: animation, child: child);
-          },
-          child: Container(
-            key: ValueKey(pet),
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFF7ED),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: const Color(0xFF8C644E), width: 2.5),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x33000000),
-                  offset: Offset(0, 3),
-                  blurRadius: 6,
-                ),
-              ],
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 250),
+      transitionBuilder: (child, animation) {
+        return ScaleTransition(scale: animation, child: child);
+      },
+      child: Container(
+        key: ValueKey(pet),
+        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 10),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFF7ED),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: const Color(0xFF8C644E), width: 2.5),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x33000000),
+              offset: Offset(0, 3),
+              blurRadius: 6,
             ),
-            child: Text(
-              pet.label,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w900,
-                color: Color(0xFF4B3D39),
-                letterSpacing: 0.5,
-              ),
-            ),
+          ],
+        ),
+        child: Text(
+          pet.label,
+          style: const TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.w900,
+            color: Color(0xFF4B3D39),
+            letterSpacing: 0.5,
           ),
         ),
-        const SizedBox(height: 6),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          decoration: BoxDecoration(
-            color: const Color(0xFFE8F5E9),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFF4CAF50), width: 1.5),
-          ),
-          child: const Text(
-            '✨ Free Starter Pet',
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF2E7D32),
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

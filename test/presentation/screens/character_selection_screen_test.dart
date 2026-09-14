@@ -26,7 +26,6 @@ void main() {
     expect(find.text('START GAME'), findsOneWidget);
     expect(find.byType(CircularCharacterCarousel), findsOneWidget);
     expect(find.text('Cat'), findsWidgets);
-    expect(find.text('✨ Free Starter Pet'), findsOneWidget);
   });
 
   testWidgets('CircularCharacterCarousel can rotate when tapping on a side pet', (
