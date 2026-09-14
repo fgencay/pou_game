@@ -78,4 +78,34 @@ void main() {
     expect(find.text('100'), findsNWidgets(2));
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('PetShopDialog displays Rabbit and Panda with correct image paths', (
+    tester,
+  ) async {
+    final inventory = PetInventory();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: PetShopDialog(
+            coins: 500,
+            inventory: inventory,
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.text('Rabbit'), findsOneWidget);
+    expect(find.text('Panda'), findsOneWidget);
+    expect(
+      find.image(const AssetImage('assets/images/pets/cat/rabbit_idle.png')),
+      findsOneWidget,
+    );
+    expect(
+      find.image(const AssetImage('assets/images/pets/cat/panda_idle.png')),
+      findsOneWidget,
+    );
+    expect(find.byKey(const ValueKey('buy-rabbit')), findsOneWidget);
+    expect(find.byKey(const ValueKey('buy-panda')), findsOneWidget);
+  });
 }
