@@ -110,6 +110,12 @@ class _HomeScreenState extends State<HomeScreen> {
               return GameAssets.bedroomSleepRabbitBackground;
             case PetType.cat2:
               return GameAssets.bedroomSleepCat2Background;
+            case PetType.dog2:
+              return GameAssets.bedroomSleepDog2Background;
+            case PetType.leon:
+              return GameAssets.bedroomSleepLeonBackground;
+            case PetType.duck:
+              return GameAssets.bedroomSleepDuckBackground;
             case PetType.cat:
               return GameAssets.bedroomSleepBackground;
           }
@@ -132,6 +138,12 @@ class _HomeScreenState extends State<HomeScreen> {
         return GameAssets.rabbitToiletVideo;
       case PetType.cat2:
         return GameAssets.cat2ToiletVideo;
+      case PetType.dog2:
+        return GameAssets.dog2ToiletVideo;
+      case PetType.leon:
+        return GameAssets.leonToiletVideo;
+      case PetType.duck:
+        return GameAssets.duckToiletVideo;
       case PetType.cat:
         return GameAssets.catToiletVideo;
     }
@@ -1050,8 +1062,8 @@ class _ToiletVideoOverlay extends StatefulWidget {
 class _ToiletVideoOverlayState extends State<_ToiletVideoOverlay> {
   VideoPlayerController? _controller;
   AudioPlayer? _sifonAudioPlayer;
+  Timer? _durationTimer;
   Timer? _sifonTimer;
-  Timer? _completionTimer;
   bool _initialized = false;
   bool _finishedCalled = false;
   bool _sifonTriggered = false;
@@ -1059,65 +1071,86 @@ class _ToiletVideoOverlayState extends State<_ToiletVideoOverlay> {
   @override
   void initState() {
     super.initState();
+    _startPlayback();
+  }
+
+  void _startPlayback() async {
     try {
       final controller = VideoPlayerController.asset(widget.videoAssetPath);
       _controller = controller;
-      controller.setVolume(0.0);
-      controller.initialize().then((_) {
-        if (!mounted) return;
-        controller.setVolume(0.0);
-        setState(() {
-          _initialized = true;
-        });
-        controller.play();
-        widget.onStarted?.call();
+      await controller.initialize();
+      if (!mounted) {
+        controller.dispose();
+        return;
+      }
 
-        final duration = controller.value.duration;
-        if (duration > Duration.zero) {
-          _completionTimer = Timer(duration + const Duration(milliseconds: 500), () {
-            if (mounted) _callFinished();
-          });
-        }
-      }).catchError((_) {
-        _callFinished();
+      await controller.setVolume(0.0);
+      await controller.setLooping(false);
+      controller.addListener(_onVideoTick);
+
+      setState(() {
+        _initialized = true;
       });
 
-      controller.addListener(_videoListener);
+      await controller.play();
+      widget.onStarted?.call();
+
+      final videoDuration = controller.value.duration;
+      final totalDuration = (videoDuration > Duration.zero)
+          ? videoDuration
+          : const Duration(seconds: 6);
+
+      // Schedule sifon flush sound in the final portion of animation
+      final sifonLeadTime = totalDuration.inMilliseconds > 7000
+          ? const Duration(seconds: 4)
+          : Duration(milliseconds: (totalDuration.inMilliseconds * 0.45).round());
+      final sifonDelay = totalDuration - sifonLeadTime;
+
+      if (sifonDelay > Duration.zero) {
+        _sifonTimer = Timer(sifonDelay, () {
+          if (mounted && !_sifonTriggered) {
+            _playSifonSound();
+          }
+        });
+      } else {
+        _playSifonSound();
+      }
+
+      // Hard completion timer based on actual video duration
+      _durationTimer = Timer(totalDuration, () {
+        if (mounted) _callFinished();
+      });
     } catch (_) {
       _callFinished();
     }
   }
 
-  void _videoListener() {
-    final controller = _controller;
-    if (controller == null || !controller.value.isInitialized) return;
+  void _onVideoTick() {
+    if (!mounted || _finishedCalled || _controller == null) return;
+    final value = _controller!.value;
+    if (!value.isInitialized) return;
 
-    final duration = controller.value.duration;
-    final position = controller.value.position;
-    final remaining = duration - position;
+    final position = value.position;
+    final duration = value.duration;
 
-    if (!_sifonTriggered &&
-        remaining <= const Duration(seconds: 4) &&
-        remaining > Duration.zero) {
-      _sifonTriggered = true;
-      _playSifonSound();
-    }
-
-    final isCompleted = controller.value.isCompleted ||
-        (position >= duration && duration > Duration.zero) ||
-        (!controller.value.isPlaying && remaining <= const Duration(milliseconds: 500));
-
-    if (isCompleted) {
+    // Trigger completion if player is done or reached end
+    if (value.isCompleted ||
+        (duration > Duration.zero && position >= duration) ||
+        (!value.isPlaying &&
+            duration > Duration.zero &&
+            position >= duration - const Duration(milliseconds: 250))) {
       _callFinished();
     }
   }
 
   void _playSifonSound() {
+    if (_sifonTriggered || !mounted) return;
+    _sifonTriggered = true;
     try {
       final player = AudioPlayer();
       _sifonAudioPlayer = player;
       player.play(AssetSource('audio/${GameAssets.sifonAudio}'));
-      _sifonTimer = Timer(const Duration(seconds: 3), () {
+      Timer(const Duration(seconds: 3), () {
         try {
           player.stop();
           player.dispose();
@@ -1130,27 +1163,39 @@ class _ToiletVideoOverlayState extends State<_ToiletVideoOverlay> {
   }
 
   void _callFinished() {
-    if (!_finishedCalled) {
-      _finishedCalled = true;
-      _completionTimer?.cancel();
+    if (_finishedCalled) return;
+    _finishedCalled = true;
+
+    _durationTimer?.cancel();
+    _sifonTimer?.cancel();
+    _controller?.removeListener(_onVideoTick);
+
+    if (mounted) {
       widget.onFinished();
     }
   }
 
   @override
   void dispose() {
-    _completionTimer?.cancel();
+    _finishedCalled = true;
+    _durationTimer?.cancel();
     _sifonTimer?.cancel();
-    try {
-      _sifonAudioPlayer?.stop();
-      _sifonAudioPlayer?.dispose();
-    } catch (_) {}
+
+    final player = _sifonAudioPlayer;
     _sifonAudioPlayer = null;
+    if (player != null) {
+      try {
+        player.stop();
+        player.dispose();
+      } catch (_) {}
+    }
 
     final controller = _controller;
+    _controller = null;
     if (controller != null) {
+      controller.removeListener(_onVideoTick);
       try {
-        controller.removeListener(_videoListener);
+        controller.pause();
         controller.dispose();
       } catch (_) {}
     }
@@ -1163,13 +1208,22 @@ class _ToiletVideoOverlayState extends State<_ToiletVideoOverlay> {
     if (!_initialized || controller == null) {
       return const SizedBox.expand();
     }
-    return SizedBox.expand(
-      child: FittedBox(
-        fit: BoxFit.cover,
-        child: SizedBox(
-          width: controller.value.size.width,
-          height: controller.value.size.height,
-          child: VideoPlayer(controller),
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        if (_initialized) _callFinished();
+      },
+      child: SizedBox.expand(
+        child: ColoredBox(
+          color: Colors.black,
+          child: FittedBox(
+            fit: BoxFit.cover,
+            child: SizedBox(
+              width: controller.value.size.width,
+              height: controller.value.size.height,
+              child: VideoPlayer(controller),
+            ),
+          ),
         ),
       ),
     );

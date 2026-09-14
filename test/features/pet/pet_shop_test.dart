@@ -51,7 +51,7 @@ void main() {
     expect(inventory.isEquipped(PetType.rabbit), isTrue);
   });
 
-  test('PetInventory buying cat2 (Sarman) for 200 coins deducts coins and equips cat2', () {
+  test('PetInventory buying cat2 (Ginger Cat) for 200 coins deducts coins and equips cat2', () {
     final inventory = PetInventory();
     final purchases = FoodPurchase(); // 250 coins
     expect(
@@ -61,6 +61,42 @@ void main() {
     expect(purchases.coins, 50);
     expect(inventory.isOwned(PetType.cat2), isTrue);
     expect(inventory.isEquipped(PetType.cat2), isTrue);
+  });
+
+  test('PetInventory buying dog2 (Spaniel Dog) for 200 coins deducts coins and equips dog2', () {
+    final inventory = PetInventory();
+    final purchases = FoodPurchase(); // 250 coins
+    expect(
+      inventory.buy(PetType.dog2, purchases.coins, purchases.spendCoins),
+      isTrue,
+    );
+    expect(purchases.coins, 50);
+    expect(inventory.isOwned(PetType.dog2), isTrue);
+    expect(inventory.isEquipped(PetType.dog2), isTrue);
+  });
+
+  test('PetInventory buying leon (Leon) for 250 coins deducts coins and equips leon', () {
+    final inventory = PetInventory();
+    final purchases = FoodPurchase(); // 250 coins
+    expect(
+      inventory.buy(PetType.leon, purchases.coins, purchases.spendCoins),
+      isTrue,
+    );
+    expect(purchases.coins, 0);
+    expect(inventory.isOwned(PetType.leon), isTrue);
+    expect(inventory.isEquipped(PetType.leon), isTrue);
+  });
+
+  test('PetInventory buying duck (Duck) for 250 coins deducts coins and equips duck', () {
+    final inventory = PetInventory();
+    final purchases = FoodPurchase(); // 250 coins
+    expect(
+      inventory.buy(PetType.duck, purchases.coins, purchases.spendCoins),
+      isTrue,
+    );
+    expect(purchases.coins, 0);
+    expect(inventory.isOwned(PetType.duck), isTrue);
+    expect(inventory.isEquipped(PetType.duck), isTrue);
   });
 
   testWidgets('PetShopDialog displays Cat and Dog and allows buying Dog', (

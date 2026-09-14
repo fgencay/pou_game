@@ -191,38 +191,73 @@ class _StartGameButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 220,
+    return Container(
+      width: 228,
       height: 54,
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF5ED45A),
-          foregroundColor: Colors.white,
-          elevation: 6,
-          shadowColor: const Color(0x882E7D32),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(28),
-            side: const BorderSide(color: Color(0xFF2E7D32), width: 2.5),
-          ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(28),
+        gradient: const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Color(0xFFFFB6C7), // Toz pembe açık
+            Color(0xFFEE889E), // Toz pembe derin
+          ],
         ),
-        child: const FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.play_arrow_rounded, size: 28),
-              SizedBox(width: 4),
-              Text(
-                'START GAME',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 1,
+        border: Border.all(
+          color: const Color(0xFFFFF6EE), // Ekru çerçeve
+          width: 2.8,
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x448A3A50),
+            offset: Offset(0, 4),
+            blurRadius: 8,
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(28),
+          splashColor: const Color(0x33FFFFFF),
+          highlightColor: const Color(0x22FFFFFF),
+          onTap: onPressed,
+          child: const Center(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.play_arrow_rounded,
+                      size: 28,
+                      color: Color(0xFFFFFDF8),
+                    ),
+                    SizedBox(width: 4),
+                    Text(
+                      'START GAME',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.2,
+                        color: Color(0xFFFFFDF8), // Ekru
+                        shadows: [
+                          Shadow(
+                            color: Color(0x446B2236),
+                            offset: Offset(0, 1.5),
+                            blurRadius: 2,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
         ),
       ),

@@ -137,9 +137,9 @@ class CircularCharacterCarouselState extends State<CircularCharacterCarousel>
         final height = widget.height;
         final centerX = width / 2;
         final centerY = height * 0.52;
-        final radiusX = (width * 0.38).clamp(90.0, 160.0);
+        final radiusX = (width * 0.40).clamp(95.0, 165.0);
         final verticalArc = (height * 0.08).clamp(12.0, 30.0);
-        final basePetSize = (height * 0.54).clamp(140.0, 240.0);
+        final basePetSize = (height * 0.50).clamp(130.0, 220.0);
 
         final items = <_CarouselItemData>[];
         for (var i = 0; i < petCount; i++) {
@@ -251,49 +251,52 @@ class _CarouselPetWidget extends StatelessWidget {
       button: true,
       label: pet.label,
       selected: isFront,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: onTap,
-        child: Opacity(
-          opacity: opacity,
-          child: SizedBox(
-            width: petDimension,
-            height: petDimension,
-            child: Stack(
-              alignment: Alignment.center,
-              clipBehavior: Clip.none,
-              children: [
-                Positioned(
-                  bottom: petDimension * 0.04,
-                  child: Container(
-                    width: petDimension * 0.65,
-                    height: petDimension * 0.12,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(
-                        Radius.elliptical(
-                          petDimension * 0.65,
-                          petDimension * 0.12,
-                        ),
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF3E2B20).withValues(
-                            alpha: (0.28 * opacity).clamp(0.0, 1.0),
+      child: IgnorePointer(
+        ignoring: isFront,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: onTap,
+          child: Opacity(
+            opacity: opacity,
+            child: SizedBox(
+              width: petDimension,
+              height: petDimension,
+              child: Stack(
+                alignment: Alignment.center,
+                clipBehavior: Clip.none,
+                children: [
+                  Positioned(
+                    bottom: petDimension * 0.04,
+                    child: Container(
+                      width: petDimension * 0.65,
+                      height: petDimension * 0.12,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(
+                          Radius.elliptical(
+                            petDimension * 0.65,
+                            petDimension * 0.12,
                           ),
-                          blurRadius: 10 * scale,
-                          spreadRadius: 2 * scale,
                         ),
-                      ],
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF3E2B20).withValues(
+                              alpha: (0.28 * opacity).clamp(0.0, 1.0),
+                            ),
+                            blurRadius: 10 * scale,
+                            spreadRadius: 2 * scale,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                Positioned.fill(
-                  child: Image.asset(
-                    pet.imageAssetPath,
-                    fit: BoxFit.contain,
+                  Positioned.fill(
+                    child: Image.asset(
+                      pet.imageAssetPath,
+                      fit: BoxFit.contain,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

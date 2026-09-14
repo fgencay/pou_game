@@ -19,6 +19,12 @@ class GameAssets {
       'assets/images/backgrounds/rabbit_sleep.png';
   static const bedroomSleepCat2Background =
       'assets/images/backgrounds/cat2_sleep.png';
+  static const bedroomSleepDog2Background =
+      'assets/images/backgrounds/dog2_sleep.png';
+  static const bedroomSleepLeonBackground =
+      'assets/images/backgrounds/leon_sleep.png';
+  static const bedroomSleepDuckBackground =
+      'assets/images/backgrounds/duck_sleep.png';
   static const fridgeIcon = 'assets/images/ui/navigation/fridge.png';
   static const apple = 'assets/images/items/food/apple.png';
   static const coinIcon = 'assets/images/ui/coin.png';
@@ -65,18 +71,39 @@ class GameAssets {
   static const cat2Happy = 'pets/cat/cat2_happy.png';
   static const cat2Eating = 'pets/cat/cat2_eat.png';
   static const cat2Sad = 'pets/cat/cat2_sad.png';
+  static const dog2Idle = 'pets/cat/dog2_idle.png';
+  static const dog2Blink = 'pets/cat/dog2_blink.png';
+  static const dog2Happy = 'pets/cat/dog2_happy.png';
+  static const dog2Eating = 'pets/cat/dog2_eat.png';
+  static const dog2Sad = 'pets/cat/dog2_sad.png';
+  static const leonIdle = 'pets/cat/leon_idle.png';
+  static const leonBlink = 'pets/cat/leon_blink.png';
+  static const leonHappy = 'pets/cat/leon_happy.png';
+  static const leonEating = 'pets/cat/leon_eat.png';
+  static const leonSad = 'pets/cat/leon_sad.png';
+  static const duckIdle = 'pets/cat/duck_idle.png';
+  static const duckBlink = 'pets/cat/duck_blink.png';
+  static const duckHappy = 'pets/cat/duck_happy.png';
+  static const duckEating = 'pets/cat/duck_eat.png';
+  static const duckSad = 'pets/cat/duck_sad.png';
   static const eatAudio = 'eat.mp3';
   static const catHappyAudio = 'kedimir.mp3';
   static const dogHappyAudio = 'kopekgulme.mp3';
   static const birdHappyAudio = 'kus.mp3';
-  static const pandaHappyAudio = 'kedimir.mp3';
+  static const pandaHappyAudio = 'panda.mp3';
   static const rabbitHappyAudio = 'rabbit.mp3';
   static const cat2HappyAudio = 'kedimir.mp3';
+  static const dog2HappyAudio = 'kopekgulme.mp3';
+  static const leonHappyAudio = 'leon.mp3';
+  static const duckHappyAudio = 'duck.mp3';
   static const catToiletVideo = 'assets/videos/cat_toilet.mp4';
-  static const dogToiletVideo = 'assets/videos/dog_toilet.mp4';
+  static const dogToiletVideo = 'assets/videos/kopek_toilet.mp4';
   static const birdToiletVideo = 'assets/videos/bird_toilet.mp4';
   static const pandaToiletVideo = 'assets/videos/panda_toilet.mp4';
   static const rabbitToiletVideo = 'assets/videos/rabbit_toilet.mp4';
   static const cat2ToiletVideo = 'assets/videos/cat2_toilet_logo_removed.mp4';
+  static const dog2ToiletVideo = 'assets/videos/dog2_toilet.mp4';
+  static const leonToiletVideo = 'assets/videos/leon_toilet.mp4';
+  static const duckToiletVideo = 'assets/videos/duck_toilet.mp4';
   static const sifonAudio = 'sifon.mp3';
 }
