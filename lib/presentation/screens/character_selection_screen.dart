@@ -72,10 +72,10 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen> {
               ),
               child: Column(
                 children: [
-                  const SizedBox(height: GameSpacing.md),
+                  const SizedBox(height: GameSpacing.lg),
                   // Header Title
                   const _OutlinedHeaderTitle(text: 'CHOOSE YOUR PET'),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 6),
                   const Text(
                     'Swipe to spin & choose your starter pet!',
                     textAlign: TextAlign.center,
@@ -85,54 +85,24 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen> {
                       color: Color(0xFF6B4E3D),
                     ),
                   ),
-                  const Spacer(),
-                  // 3D Circular Character Carousel with Navigation Chevrons
-                  SizedBox(
+                  const Spacer(flex: 3),
+                  // 3D Circular Character Carousel
+                  CircularCharacterCarousel(
+                    key: _carouselKey,
+                    pets: PetType.values,
+                    selectedPet: _selectedPet,
+                    onPetChanged: _onPetChanged,
                     height: carouselHeight,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        CircularCharacterCarousel(
-                          key: _carouselKey,
-                          pets: PetType.values,
-                          selectedPet: _selectedPet,
-                          onPetChanged: _onPetChanged,
-                          height: carouselHeight,
-                        ),
-                        // Left navigation button
-                        Positioned(
-                          left: 0,
-                          child: _CarouselArrowButton(
-                            key: const ValueKey('prev-pet-button'),
-                            icon: Icons.chevron_left_rounded,
-                            tooltip: 'Previous Pet',
-                            onPressed: () =>
-                                _carouselKey.currentState?.rotatePrevious(),
-                          ),
-                        ),
-                        // Right navigation button
-                        Positioned(
-                          right: 0,
-                          child: _CarouselArrowButton(
-                            key: const ValueKey('next-pet-button'),
-                            icon: Icons.chevron_right_rounded,
-                            tooltip: 'Next Pet',
-                            onPressed: () =>
-                                _carouselKey.currentState?.rotateNext(),
-                          ),
-                        ),
-                      ],
-                    ),
                   ),
                   const SizedBox(height: GameSpacing.md),
                   // Character Name Badge
                   _SelectedPetBadge(pet: _selectedPet),
-                  const Spacer(),
+                  const Spacer(flex: 2),
                   // Start Game Button
                   _StartGameButton(
                     onPressed: _startGame,
                   ),
-                  const SizedBox(height: GameSpacing.md),
+                  const SizedBox(height: GameSpacing.lg),
                 ],
               ),
             ),
@@ -243,54 +213,6 @@ class _SelectedPetBadge extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _CarouselArrowButton extends StatelessWidget {
-  const _CarouselArrowButton({
-    super.key,
-    required this.icon,
-    required this.tooltip,
-    required this.onPressed,
-  });
-
-  final IconData icon;
-  final String tooltip;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Tooltip(
-      message: tooltip,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(30),
-          child: Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFF4EB).withValues(alpha: 0.9),
-              shape: BoxShape.circle,
-              border: Border.all(color: const Color(0xFF8C644E), width: 2),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x33000000),
-                  offset: Offset(0, 2),
-                  blurRadius: 4,
-                ),
-              ],
-            ),
-            child: Icon(
-              icon,
-              size: 28,
-              color: const Color(0xFF4B3D39),
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

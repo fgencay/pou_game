@@ -29,7 +29,7 @@ void main() {
     expect(find.text('✨ Free Starter Pet'), findsOneWidget);
   });
 
-  testWidgets('CircularCharacterCarousel can rotate to next and previous pet via chevron buttons', (
+  testWidgets('CircularCharacterCarousel can rotate when tapping on a side pet', (
     WidgetTester tester,
   ) async {
     tester.view.physicalSize = const Size(360, 640);
@@ -46,19 +46,12 @@ void main() {
 
     expect(find.text('Cat'), findsWidgets);
 
-    // Tap Next Pet button
-    await tester.tap(find.byTooltip('Next Pet'));
+    // Tap on Dog (a side pet)
+    await tester.tap(find.bySemanticsLabel('Dog').first);
     await tester.pumpAndSettle();
 
     // Next pet (Dog) should now be selected and visible in badge
     expect(find.text('Dog'), findsWidgets);
-
-    // Tap Previous Pet button
-    await tester.tap(find.byTooltip('Previous Pet'));
-    await tester.pumpAndSettle();
-
-    // Cat should be selected again
-    expect(find.text('Cat'), findsWidgets);
   });
 
   testWidgets('Dragging carousel rotates and snaps to nearest pet', (

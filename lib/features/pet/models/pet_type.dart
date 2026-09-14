@@ -4,7 +4,7 @@ enum PetType {
   cat(
     id: 'cat',
     label: 'Cat',
-    price: 0,
+    price: 150,
     idleAsset: GameAssets.catIdle,
     blinkAsset: GameAssets.catBlink,
     happyAsset: GameAssets.catHappy,
