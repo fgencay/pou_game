@@ -72,10 +72,10 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen> {
               ),
               child: Column(
                 children: [
-                  const SizedBox(height: GameSpacing.xl),
+                  const Spacer(flex: 2),
                   // Header Title in Upper-Middle
                   const _OutlinedHeaderTitle(text: 'CHOOSE YOUR PET'),
-                  const Spacer(flex: 2),
+                  const Spacer(flex: 1),
                   // 3D Circular Character Carousel
                   CircularCharacterCarousel(
                     key: _carouselKey,
@@ -84,15 +84,15 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen> {
                     onPetChanged: _onPetChanged,
                     height: carouselHeight,
                   ),
-                  const SizedBox(height: GameSpacing.lg),
+                  const SizedBox(height: GameSpacing.md),
                   // Character Name Badge
                   _SelectedPetBadge(pet: _selectedPet),
-                  const Spacer(flex: 3),
-                  // Start Game Button
+                  const SizedBox(height: GameSpacing.md),
+                  // Start Game Button directly below name badge
                   _StartGameButton(
                     onPressed: _startGame,
                   ),
-                  const SizedBox(height: GameSpacing.lg),
+                  const Spacer(flex: 2),
                 ],
               ),
             ),
