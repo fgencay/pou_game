@@ -99,6 +99,18 @@ void main() {
     expect(inventory.isEquipped(PetType.duck), isTrue);
   });
 
+  test('PetInventory buying parrot (Parrot) for 250 coins deducts coins and equips parrot', () {
+    final inventory = PetInventory();
+    final purchases = FoodPurchase(); // 250 coins
+    expect(
+      inventory.buy(PetType.parrot, purchases.coins, purchases.spendCoins),
+      isTrue,
+    );
+    expect(purchases.coins, 0);
+    expect(inventory.isOwned(PetType.parrot), isTrue);
+    expect(inventory.isEquipped(PetType.parrot), isTrue);
+  });
+
   testWidgets('PetShopDialog displays Cat and Dog and allows buying Dog', (
     tester,
   ) async {

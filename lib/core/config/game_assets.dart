@@ -25,6 +25,8 @@ class GameAssets {
       'assets/images/backgrounds/leon_sleep.png';
   static const bedroomSleepDuckBackground =
       'assets/images/backgrounds/duck_sleep.png';
+  static const bedroomSleepParrotBackground =
+      'assets/images/backgrounds/parrot_sleep.png';
   static const fridgeIcon = 'assets/images/ui/navigation/fridge.png';
   static const apple = 'assets/images/items/food/apple.png';
   static const coinIcon = 'assets/images/ui/coin.png';
@@ -86,6 +88,11 @@ class GameAssets {
   static const duckHappy = 'pets/cat/duck_happy.png';
   static const duckEating = 'pets/cat/duck_eat.png';
   static const duckSad = 'pets/cat/duck_sad.png';
+  static const parrotIdle = 'pets/cat/parrot_idle.png';
+  static const parrotBlink = 'pets/cat/parrot_blink.png';
+  static const parrotHappy = 'pets/cat/parrot_happy.png';
+  static const parrotEating = 'pets/cat/parrot_eat.png';
+  static const parrotSad = 'pets/cat/parrot_sad.png';
   static const eatAudio = 'eat.mp3';
   static const catHappyAudio = 'kedimir.mp3';
   static const dogHappyAudio = 'kopekgulme.mp3';
@@ -96,6 +103,7 @@ class GameAssets {
   static const dog2HappyAudio = 'kopekgulme.mp3';
   static const leonHappyAudio = 'leon.mp3';
   static const duckHappyAudio = 'duck.mp3';
+  static const parrotHappyAudio = 'parrot.mp3';
   static const catToiletVideo = 'assets/videos/cat_toilet.mp4';
   static const dogToiletVideo = 'assets/videos/kopek_toilet.mp4';
   static const birdToiletVideo = 'assets/videos/bird_toilet.mp4';
@@ -105,5 +113,6 @@ class GameAssets {
   static const dog2ToiletVideo = 'assets/videos/dog2_toilet.mp4';
   static const leonToiletVideo = 'assets/videos/leon_toilet.mp4';
   static const duckToiletVideo = 'assets/videos/duck_toilet.mp4';
+  static const parrotToiletVideo = 'assets/videos/parrot_toilet.mp4';
   static const sifonAudio = 'sifon.mp3';
 }

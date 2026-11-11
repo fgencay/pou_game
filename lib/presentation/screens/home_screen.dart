@@ -116,6 +116,8 @@ class _HomeScreenState extends State<HomeScreen> {
               return GameAssets.bedroomSleepLeonBackground;
             case PetType.duck:
               return GameAssets.bedroomSleepDuckBackground;
+            case PetType.parrot:
+              return GameAssets.bedroomSleepParrotBackground;
             case PetType.cat:
               return GameAssets.bedroomSleepBackground;
           }
@@ -144,6 +146,8 @@ class _HomeScreenState extends State<HomeScreen> {
         return GameAssets.leonToiletVideo;
       case PetType.duck:
         return GameAssets.duckToiletVideo;
+      case PetType.parrot:
+        return GameAssets.parrotToiletVideo;
       case PetType.cat:
         return GameAssets.catToiletVideo;
     }

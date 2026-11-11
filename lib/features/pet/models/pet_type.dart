@@ -99,6 +99,17 @@ enum PetType {
     eatingAsset: GameAssets.duckEating,
     sadAsset: GameAssets.duckSad,
     happyAudio: GameAssets.duckHappyAudio,
+  ),
+  parrot(
+    id: 'parrot',
+    label: 'Parrot',
+    price: 250,
+    idleAsset: GameAssets.parrotIdle,
+    blinkAsset: GameAssets.parrotBlink,
+    happyAsset: GameAssets.parrotHappy,
+    eatingAsset: GameAssets.parrotEating,
+    sadAsset: GameAssets.parrotSad,
+    happyAudio: GameAssets.parrotHappyAudio,
   );
 
   const PetType({
